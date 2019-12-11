@@ -368,15 +368,18 @@ class CallKeep(private val channel: MethodChannel, private var applicationContex
     private fun backToForeground(result: MethodChannel.Result) {
         val activity = currentActivity
 
-        if (activity == null) {
-            result.error(E_ACTIVITY_DOES_NOT_EXIST, "Activity doesn't exist", null)
-            return
-        }
-
         val packageName = applicationContext.packageName
         val focusIntent = applicationContext.packageManager.getLaunchIntentForPackage(packageName)!!.cloneFilter()
+
         focusIntent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
-        activity.startActivity(focusIntent)
+
+        if (activity != null) {
+            activity.startActivity(focusIntent)
+        } else {
+            focusIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            applicationContext.startActivity(focusIntent)
+        }
+
         result.success(null)
     }
 
