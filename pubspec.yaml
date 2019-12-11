@@ -1,6 +1,6 @@
 name: flutter_callkeep
 description: iOS CallKit and Android ConnectionService bindings for Flutter
-version: 0.1.1
+version: 0.1.2
 author: Linus Unnebäck <linus@folkdatorn.se>
 homepage: https://github.com/doneservices/flutter_callkeep
 
