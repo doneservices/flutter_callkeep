@@ -38,6 +38,8 @@ enum HandleType {
 class CallKeep {
   static const MethodChannel _channel = const MethodChannel('co.doneservices/callkeep');
 
+  static Future<bool> isCurrentDeviceSupported = _channel.invokeMethod<bool>('isCurrentDeviceSupported');
+
   static final _didReceiveStartCallAction = StreamController<StartCallAction>.broadcast();
   static final _performAnswerCallAction = StreamController<AnswerCallAction>.broadcast();
   static final _performEndCallAction = StreamController<EndCallAction>.broadcast();

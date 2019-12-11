@@ -143,6 +143,9 @@ class CallKeep(private val channel: MethodChannel, private var applicationContex
             "backToForeground" -> {
                 backToForeground(result)
             }
+            "isCurrentDeviceSupported" -> {
+                isCurrentDeviceSupported(result)
+            }
             else -> {
                 result.notImplemented()
             }
@@ -375,6 +378,10 @@ class CallKeep(private val channel: MethodChannel, private var applicationContex
         focusIntent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
         activity.startActivity(focusIntent)
         result.success(null)
+    }
+
+    private fun isCurrentDeviceSupported(result: MethodChannel.Result) {
+        result.success(isConnectionServiceAvailable());
     }
 
     private fun registerPhoneAccount(appContext: Context, imageName: String?) {
