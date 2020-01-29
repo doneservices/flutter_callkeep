@@ -3,7 +3,7 @@ library flutter_callkeep;
 import 'dart:async' show Stream, StreamController;
 import 'dart:io' show Platform;
 
-import 'package:flutter/foundation.dart' show describeEnum;
+import 'package:flutter/foundation.dart' show describeEnum, required;
 import 'package:flutter/material.dart' show showDialog, AlertDialog, BuildContext, FlatButton, Navigator, Text, Widget;
 import 'package:flutter/services.dart' show MethodCall, MethodChannel;
 
@@ -243,5 +243,12 @@ class CallKeep {
 
   static Future<void> backToForeground() async {
     await _channel.invokeMethod('backToForeground');
+  }
+
+  static Future<void> displayCustomIncomingCall(String packageName, String className, {@required String icon, Map<String, dynamic> extra}) async {
+    assert(packageName != null);
+    assert(className != null);
+    assert(icon != null);
+    await _channel.invokeMethod('displayCustomIncomingCall', {'packageName': packageName, 'className': className, 'icon': icon, 'extra': extra ?? Map()});
   }
 }

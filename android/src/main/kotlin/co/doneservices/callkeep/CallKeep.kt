@@ -2,6 +2,8 @@ package co.doneservices.callkeep
 
 import android.Manifest
 import android.app.Activity
+import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.*
 import android.content.pm.PackageManager
 import android.graphics.drawable.Icon
@@ -12,6 +14,7 @@ import android.telecom.*
 import android.telephony.TelephonyManager
 import android.util.Log
 import androidx.core.app.ActivityCompat
+import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import io.flutter.plugin.common.MethodCall
@@ -20,6 +23,8 @@ import io.flutter.plugin.common.PluginRegistry
 import io.wazo.callkeep.Constants
 import io.wazo.callkeep.VoiceConnection
 import io.wazo.callkeep.VoiceConnectionService
+import kotlin.collections.HashMap
+import kotlin.random.Random
 
 private const val E_ACTIVITY_DOES_NOT_EXIST = "E_ACTIVITY_DOES_NOT_EXIST"
 
@@ -142,6 +147,10 @@ class CallKeep(private val channel: MethodChannel, private var applicationContex
             }
             "backToForeground" -> {
                 backToForeground(result)
+            }
+            "displayCustomIncomingCall" -> {
+                displayCustomIncomingCall(call.argument("packageName")!!, call.argument("className")!!, call.argument("icon")!!, call.argument("extra")!!)
+                result.success(null)
             }
             "isCurrentDeviceSupported" -> {
                 isCurrentDeviceSupported(result)
@@ -381,6 +390,33 @@ class CallKeep(private val channel: MethodChannel, private var applicationContex
         }
 
         result.success(null)
+    }
+
+    private fun displayCustomIncomingCall(packageName: String, className: String, icon: String, extra: HashMap<String, String>) {
+        val notificationManager = applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
+        var launchIntent = Intent()
+        launchIntent.setClassName(packageName, "$packageName.$className")
+        launchIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
+
+        for ((key, value) in extra) {
+            launchIntent.putExtra(key, value)
+        }
+
+        val pendingIntent = PendingIntent.getActivity(applicationContext, 0, launchIntent, 0)
+        val builder = NotificationCompat.Builder(applicationContext, "my_channel_id")
+
+        builder.setSmallIcon(applicationContext.resources.getIdentifier(icon, "drawable", applicationContext.packageName))
+        builder.setFullScreenIntent(pendingIntent, true)
+        builder.setOngoing(true)
+        builder.setCategory(NotificationCompat.CATEGORY_CALL)
+        builder.setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+        builder.setPriority(NotificationCompat.PRIORITY_MAX)
+
+        val id = Random.nextInt(1000, 10000)
+        val notification = builder.build()
+
+        notificationManager.notify(id, notification)
     }
 
     private fun isCurrentDeviceSupported(result: MethodChannel.Result) {
