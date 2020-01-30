@@ -2,6 +2,7 @@ package co.doneservices.callkeep
 
 import android.Manifest
 import android.app.Activity
+import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.*
@@ -414,6 +415,12 @@ class CallKeep(private val channel: MethodChannel, private var applicationContex
         builder.setCategory(NotificationCompat.CATEGORY_CALL)
         builder.setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
         builder.setPriority(NotificationCompat.PRIORITY_MAX)
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channel = NotificationChannel("incoming_calls", "Incoming Calls", NotificationManager.IMPORTANCE_HIGH)
+            notificationManager.createNotificationChannel(channel)
+            builder.setChannelId(channel.id)
+        }
 
         notificationManager.notify(id, builder.build())
     }
