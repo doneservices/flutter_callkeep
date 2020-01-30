@@ -393,11 +393,13 @@ class CallKeep(private val channel: MethodChannel, private var applicationContex
     }
 
     private fun displayCustomIncomingCall(packageName: String, className: String, icon: String, extra: HashMap<String, String>) {
+        val id = Random.nextInt(1000, 10000)
         val notificationManager = applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
         var launchIntent = Intent()
         launchIntent.setClassName(packageName, "$packageName.$className")
         launchIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
+        launchIntent.putExtra("co.doneservices.callkeep.NOTIFICATION_ID", id)
 
         for ((key, value) in extra) {
             launchIntent.putExtra(key, value)
@@ -413,10 +415,7 @@ class CallKeep(private val channel: MethodChannel, private var applicationContex
         builder.setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
         builder.setPriority(NotificationCompat.PRIORITY_MAX)
 
-        val id = Random.nextInt(1000, 10000)
-        val notification = builder.build()
-
-        notificationManager.notify(id, notification)
+        notificationManager.notify(id, builder.build())
     }
 
     private fun isCurrentDeviceSupported(result: MethodChannel.Result) {
