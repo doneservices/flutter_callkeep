@@ -406,7 +406,7 @@ class CallKeep(private val channel: MethodChannel, private var applicationContex
             launchIntent.putExtra(key, value)
         }
 
-        val pendingIntent = PendingIntent.getActivity(applicationContext, 0, launchIntent, 0)
+        val pendingIntent = PendingIntent.getActivity(applicationContext, 0, launchIntent, PendingIntent.FLAG_CANCEL_CURRENT)
         val builder = NotificationCompat.Builder(applicationContext, "my_channel_id")
 
         builder.setSmallIcon(applicationContext.resources.getIdentifier(icon, "drawable", applicationContext.packageName))
