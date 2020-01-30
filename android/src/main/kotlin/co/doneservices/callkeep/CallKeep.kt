@@ -25,12 +25,12 @@ import io.wazo.callkeep.Constants
 import io.wazo.callkeep.VoiceConnection
 import io.wazo.callkeep.VoiceConnectionService
 import kotlin.collections.HashMap
-import kotlin.random.Random
 
 private const val E_ACTIVITY_DOES_NOT_EXIST = "E_ACTIVITY_DOES_NOT_EXIST"
 
 private const val TAG = "CallKeep:CallKeepPlugin"
 private const val REQUEST_READ_PHONE_STATE = 58251
+private const val NOTIFICATION_ID = 38496
 
 private val requiredPermissions = arrayOf(Manifest.permission.READ_PHONE_STATE, Manifest.permission.CALL_PHONE, Manifest.permission.RECORD_AUDIO)
 
@@ -394,13 +394,12 @@ class CallKeep(private val channel: MethodChannel, private var applicationContex
     }
 
     private fun displayCustomIncomingCall(packageName: String, className: String, icon: String, extra: HashMap<String, String>) {
-        val id = Random.nextInt(1000, 10000)
         val notificationManager = applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
         var launchIntent = Intent()
         launchIntent.setClassName(packageName, "$packageName.$className")
         launchIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
-        launchIntent.putExtra("co.doneservices.callkeep.NOTIFICATION_ID", id)
+        launchIntent.putExtra("co.doneservices.callkeep.NOTIFICATION_ID", NOTIFICATION_ID)
 
         for ((key, value) in extra) {
             launchIntent.putExtra(key, value)
@@ -433,7 +432,7 @@ class CallKeep(private val channel: MethodChannel, private var applicationContex
             builder.setChannelId(channel.id)
         }
 
-        notificationManager.notify(id, builder.build())
+        notificationManager.notify(NOTIFICATION_ID, builder.build())
     }
 
     private fun isCurrentDeviceSupported(result: MethodChannel.Result) {
