@@ -421,6 +421,7 @@ class CallKeep(private val channel: MethodChannel, private var applicationContex
         builder.setCategory(NotificationCompat.CATEGORY_CALL)
         builder.setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
         builder.setPriority(NotificationCompat.PRIORITY_MAX)
+        builder.setAutoCancel(true)
 
         builder.setContentTitle("Incoming call")
         builder.addAction(0, "Decline", PendingIntent.getActivity(applicationContext, 1, declineIntent, PendingIntent.FLAG_CANCEL_CURRENT))
