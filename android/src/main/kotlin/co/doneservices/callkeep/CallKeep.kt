@@ -406,6 +406,12 @@ class CallKeep(private val channel: MethodChannel, private var applicationContex
             launchIntent.putExtra(key, value)
         }
 
+        var answerIntent = Intent(launchIntent)
+        answerIntent.putExtra("co.doneservices.callkeep.ACTION", "answer")
+
+        var declineIntent = Intent(launchIntent)
+        declineIntent.putExtra("co.doneservices.callkeep.ACTION", "decline")
+
         val pendingIntent = PendingIntent.getActivity(applicationContext, 0, launchIntent, PendingIntent.FLAG_CANCEL_CURRENT)
         val builder = NotificationCompat.Builder(applicationContext, "my_channel_id")
 
@@ -415,6 +421,10 @@ class CallKeep(private val channel: MethodChannel, private var applicationContex
         builder.setCategory(NotificationCompat.CATEGORY_CALL)
         builder.setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
         builder.setPriority(NotificationCompat.PRIORITY_MAX)
+
+        builder.setContentTitle("Incoming call")
+        builder.addAction(0, "Decline", PendingIntent.getActivity(applicationContext, 1, declineIntent, PendingIntent.FLAG_CANCEL_CURRENT))
+        builder.addAction(0, "Answer", PendingIntent.getActivity(applicationContext, 2, answerIntent, PendingIntent.FLAG_CANCEL_CURRENT))
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel("incoming_calls", "Incoming Calls", NotificationManager.IMPORTANCE_HIGH)
