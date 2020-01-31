@@ -153,6 +153,10 @@ class CallKeep(private val channel: MethodChannel, private var applicationContex
                 displayCustomIncomingCall(call.argument("packageName")!!, call.argument("className")!!, call.argument("icon")!!, call.argument("extra")!!)
                 result.success(null)
             }
+            "dismissCustomIncomingCall" -> {
+                dismissCustomIncomingCall()
+                result.success(null)
+            }
             "isCurrentDeviceSupported" -> {
                 isCurrentDeviceSupported(result)
             }
@@ -432,6 +436,11 @@ class CallKeep(private val channel: MethodChannel, private var applicationContex
         builder.addAction(0, "Answer", PendingIntent.getActivity(applicationContext, 2, answerIntent, PendingIntent.FLAG_CANCEL_CURRENT))
 
         notificationManager.notify(NOTIFICATION_ID, builder.build())
+    }
+
+    private fun dismissCustomIncomingCall() {
+        val notificationManager = applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.cancel(NOTIFICATION_ID)
     }
 
     private fun isCurrentDeviceSupported(result: MethodChannel.Result) {
