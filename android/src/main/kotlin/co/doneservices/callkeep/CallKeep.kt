@@ -150,7 +150,7 @@ class CallKeep(private val channel: MethodChannel, private var applicationContex
                 backToForeground(result)
             }
             "displayCustomIncomingCall" -> {
-                displayCustomIncomingCall(call.argument("packageName")!!, call.argument("className")!!, call.argument("icon")!!, call.argument("extra")!!)
+                displayCustomIncomingCall(call.argument("packageName")!!, call.argument("className")!!, call.argument("icon")!!, call.argument("extra")!!, call.argument("contentTitle")!!, call.argument("answerText")!!, call.argument("declineText")!!)
                 result.success(null)
             }
             "dismissCustomIncomingCall" -> {
@@ -397,7 +397,7 @@ class CallKeep(private val channel: MethodChannel, private var applicationContex
         result.success(null)
     }
 
-    private fun displayCustomIncomingCall(packageName: String, className: String, icon: String, extra: HashMap<String, String>) {
+    private fun displayCustomIncomingCall(packageName: String, className: String, icon: String, extra: HashMap<String, String>, contentTitle: String, answerText: String, declineText: String) {
         val notificationManager = applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
         var launchIntent = Intent()
@@ -431,9 +431,9 @@ class CallKeep(private val channel: MethodChannel, private var applicationContex
         builder.setPriority(NotificationCompat.PRIORITY_MAX)
         builder.setAutoCancel(true)
 
-        builder.setContentTitle("Incoming call")
-        builder.addAction(0, "Decline", PendingIntent.getActivity(applicationContext, 1, declineIntent, PendingIntent.FLAG_CANCEL_CURRENT))
-        builder.addAction(0, "Answer", PendingIntent.getActivity(applicationContext, 2, answerIntent, PendingIntent.FLAG_CANCEL_CURRENT))
+        builder.setContentTitle(contentTitle)
+        builder.addAction(0, declineText, PendingIntent.getActivity(applicationContext, 1, declineIntent, PendingIntent.FLAG_CANCEL_CURRENT))
+        builder.addAction(0, answerText, PendingIntent.getActivity(applicationContext, 2, answerIntent, PendingIntent.FLAG_CANCEL_CURRENT))
 
         notificationManager.notify(NOTIFICATION_ID, builder.build())
     }
