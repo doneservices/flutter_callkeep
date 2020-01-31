@@ -1,3 +1,7 @@
+## 0.1.4
+
+- Add `dismissCustomIncomingCall` function (#4)
+
 ## 0.1.3
 
 - Add `displayCustomIncomingCall` function (#3)
