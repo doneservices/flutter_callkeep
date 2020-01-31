@@ -1,3 +1,7 @@
+## 0.1.6
+
+- Allow setting ringtone uri on custom notification (#6)
+
 ## 0.1.5
 
 - Add ability to customize heads-up notification (#5)
