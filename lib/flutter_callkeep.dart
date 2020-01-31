@@ -245,11 +245,27 @@ class CallKeep {
     await _channel.invokeMethod('backToForeground');
   }
 
-  static Future<void> displayCustomIncomingCall(String packageName, String className, {@required String icon, Map<String, dynamic> extra}) async {
+  static Future<void> displayCustomIncomingCall(
+    String packageName,
+    String className, {
+    @required String icon,
+    Map<String, dynamic> extra,
+    String contentTitle,
+    String answerText,
+    String declineText,
+  }) async {
     assert(packageName != null);
     assert(className != null);
     assert(icon != null);
-    await _channel.invokeMethod('displayCustomIncomingCall', {'packageName': packageName, 'className': className, 'icon': icon, 'extra': extra ?? Map()});
+    await _channel.invokeMethod('displayCustomIncomingCall', {
+      'packageName': packageName,
+      'className': className,
+      'icon': icon,
+      'extra': extra ?? Map(),
+      'contentTitle': contentTitle ?? 'Incoming call',
+      'answerText': answerText ?? 'Answer',
+      'declineText': declineText ?? 'Decline',
+    });
   }
 
   static Future<void> dismissCustomIncomingCall() async {
