@@ -251,4 +251,8 @@ class CallKeep {
     assert(icon != null);
     await _channel.invokeMethod('displayCustomIncomingCall', {'packageName': packageName, 'className': className, 'icon': icon, 'extra': extra ?? Map()});
   }
+
+  static Future<void> dismissCustomIncomingCall() async {
+    await _channel.invokeMethod('dismissCustomIncomingCall');
+  }
 }
