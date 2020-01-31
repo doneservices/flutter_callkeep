@@ -411,8 +411,13 @@ class CallKeep(private val channel: MethodChannel, private var applicationContex
         var declineIntent = Intent(launchIntent)
         declineIntent.putExtra("co.doneservices.callkeep.ACTION", "decline")
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channel = NotificationChannel("incoming_calls", "Incoming Calls", NotificationManager.IMPORTANCE_HIGH)
+            notificationManager.createNotificationChannel(channel)
+        }
+
         val pendingIntent = PendingIntent.getActivity(applicationContext, 0, launchIntent, PendingIntent.FLAG_CANCEL_CURRENT)
-        val builder = NotificationCompat.Builder(applicationContext, "my_channel_id")
+        val builder = NotificationCompat.Builder(applicationContext, "incoming_calls")
 
         builder.setSmallIcon(applicationContext.resources.getIdentifier(icon, "drawable", applicationContext.packageName))
         builder.setFullScreenIntent(pendingIntent, true)
@@ -425,12 +430,6 @@ class CallKeep(private val channel: MethodChannel, private var applicationContex
         builder.setContentTitle("Incoming call")
         builder.addAction(0, "Decline", PendingIntent.getActivity(applicationContext, 1, declineIntent, PendingIntent.FLAG_CANCEL_CURRENT))
         builder.addAction(0, "Answer", PendingIntent.getActivity(applicationContext, 2, answerIntent, PendingIntent.FLAG_CANCEL_CURRENT))
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel("incoming_calls", "Incoming Calls", NotificationManager.IMPORTANCE_HIGH)
-            notificationManager.createNotificationChannel(channel)
-            builder.setChannelId(channel.id)
-        }
 
         notificationManager.notify(NOTIFICATION_ID, builder.build())
     }
