@@ -150,7 +150,7 @@ class CallKeep(private val channel: MethodChannel, private var applicationContex
                 backToForeground(result)
             }
             "displayCustomIncomingCall" -> {
-                displayCustomIncomingCall(call.argument("packageName")!!, call.argument("className")!!, call.argument("icon")!!, call.argument("extra")!!, call.argument("contentTitle")!!, call.argument("answerText")!!, call.argument("declineText")!!)
+                displayCustomIncomingCall(call.argument("packageName")!!, call.argument("className")!!, call.argument("icon")!!, call.argument("extra")!!, call.argument("contentTitle")!!, call.argument("answerText")!!, call.argument("declineText")!!, call.argument("ringtoneUri"))
                 result.success(null)
             }
             "dismissCustomIncomingCall" -> {
@@ -397,7 +397,7 @@ class CallKeep(private val channel: MethodChannel, private var applicationContex
         result.success(null)
     }
 
-    private fun displayCustomIncomingCall(packageName: String, className: String, icon: String, extra: HashMap<String, String>, contentTitle: String, answerText: String, declineText: String) {
+    private fun displayCustomIncomingCall(packageName: String, className: String, icon: String, extra: HashMap<String, String>, contentTitle: String, answerText: String, declineText: String, ringtoneUri: String?) {
         val notificationManager = applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
         var launchIntent = Intent()
@@ -430,6 +430,10 @@ class CallKeep(private val channel: MethodChannel, private var applicationContex
         builder.setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
         builder.setPriority(NotificationCompat.PRIORITY_MAX)
         builder.setAutoCancel(true)
+
+        if (ringtoneUri != null) {
+            builder.setSound(Uri.parse(ringtoneUri))
+        }
 
         builder.setContentTitle(contentTitle)
         builder.addAction(0, declineText, PendingIntent.getActivity(applicationContext, 1, declineIntent, PendingIntent.FLAG_CANCEL_CURRENT))

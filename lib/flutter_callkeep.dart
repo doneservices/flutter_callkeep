@@ -253,6 +253,7 @@ class CallKeep {
     String contentTitle,
     String answerText,
     String declineText,
+    String ringtoneUri,
   }) async {
     assert(packageName != null);
     assert(className != null);
@@ -265,6 +266,7 @@ class CallKeep {
       'contentTitle': contentTitle ?? 'Incoming call',
       'answerText': answerText ?? 'Answer',
       'declineText': declineText ?? 'Decline',
+      'ringtoneUri': ringtoneUri,
     });
   }
 
