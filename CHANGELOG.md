@@ -1,3 +1,7 @@
+## 0.1.3
+
+- Add `displayCustomIncomingCall` function (#3)
+
 ## 0.1.2
 
 - Add `isCurrentDeviceSupported` property
