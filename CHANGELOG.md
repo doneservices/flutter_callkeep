@@ -1,3 +1,7 @@
+## 0.1.5
+
+- Add ability to customize heads-up notification (#5)
+
 ## 0.1.4
 
 - Add `dismissCustomIncomingCall` function (#4)
