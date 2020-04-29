@@ -62,7 +62,6 @@ class CallKeep(private val channel: MethodChannel, private var applicationContex
     private fun hasPhoneAccount(): Boolean {
         return isConnectionServiceAvailable() && telecomManager!!.getPhoneAccount(handle).isEnabled
     }
-
     override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
         when (call.method) {
             "setup" -> {
@@ -409,11 +408,20 @@ class CallKeep(private val channel: MethodChannel, private var applicationContex
             launchIntent.putExtra(key, value)
         }
 
-        var answerIntent = Intent(launchIntent)
+        var answerIntent = Intent()
         answerIntent.putExtra("co.doneservices.callkeep.ACTION", "answer")
+        answerIntent.setClassName(packageName, "$packageName.$className")
+        for ((key, value) in extra) {
+            answerIntent.putExtra(key, value)
+        }
 
-        var declineIntent = Intent(launchIntent)
+        var declineIntent = Intent()
         declineIntent.putExtra("co.doneservices.callkeep.ACTION", "decline")
+        declineIntent.setClassName(packageName, "$packageName.$className")
+        for ((key, value) in extra) {
+            declineIntent.putExtra(key, value)
+        }
+        
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel("incoming_calls", "Incoming Calls", NotificationManager.IMPORTANCE_HIGH)
@@ -507,6 +515,9 @@ class CallKeep(private val channel: MethodChannel, private var applicationContex
         isReceiverRegistered = true
     }
 
+
+    /// VideoBroadcastReceiver gets events from VoiceConnectionService
+    /// it then invokes methods on the Flutter app
     private inner class VoiceBroadcastReceiver : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             Log.i(TAG, "Received action: ${intent.action}")
