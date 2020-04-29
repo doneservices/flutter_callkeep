@@ -19,20 +19,17 @@ flutter_callkeep requires the following permissions.
 
 ### Android
 
-Open the `AndroidManifest.xml` file and add the required device permissions to the file.
+If you want to use the function `displayIncomingCall`, please add the following permissions and service to the `AndroidManifest.xml`.
 
 ```xml
 ..
-<uses-permission android:name="android.permission.BIND_TELECOM_CONNECTION_SERVICE"/>
+<uses-permission android:name="android.permission.BIND_TELECOM_CONNECTION_SERVICE" />
 <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 <uses-permission android:name="android.permission.READ_PHONE_STATE" />
 <uses-permission android:name="android.permission.CALL_PHONE" />
-<uses-permission android:name="android.permission.RECORD_AUDIO"/>
+<uses-permission android:name="android.permission.RECORD_AUDIO" />
 ..
 ```
-
-Add service to the `<application>` tag
-
 ```xml
 <application>
     ..
@@ -45,4 +42,10 @@ Add service to the `<application>` tag
     </service>
     ..
 </application>
+```
+
+if you want to use the function `displayCustomIncomingCall`, please add the following permission to the `AndroidManifest.xml`.
+
+```xml
+<uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
 ```
