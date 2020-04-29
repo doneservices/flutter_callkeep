@@ -3,7 +3,7 @@
 #
 Pod::Spec.new do |s|
   s.name             = 'flutter_callkeep'
-  s.version          = '0.1.6'
+  s.version          = '0.1.8'
   s.summary          = 'iOS CallKit and Android ConnectionService bindings for Flutter'
   s.description      = <<-DESC
 iOS CallKit and Android ConnectionService bindings for Flutter

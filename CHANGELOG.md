@@ -1,3 +1,12 @@
+## 0.1.8
+
+- (ios) Fix bridging header import
+- (android) Don't launch custom call activity on Answer / Decline actions in displayCustomCall
+
+## 0.1.7
+
+- (ios) Fix podspec name
+
 ## 0.1.6
 
 - Allow setting ringtone uri on custom notification (#6)
