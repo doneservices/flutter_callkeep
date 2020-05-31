@@ -49,6 +49,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import static io.wazo.callkeep.Constants.ACTION_DISPLAY_INCOMING;
 import static io.wazo.callkeep.Constants.ACTION_AUDIO_SESSION;
 import static io.wazo.callkeep.Constants.ACTION_ONGOING_CALL;
 import static io.wazo.callkeep.Constants.ACTION_CHECK_REACHABILITY;
@@ -118,12 +119,16 @@ public class VoiceConnectionService extends ConnectionService {
 
     @Override
     public Connection onCreateIncomingConnection(PhoneAccountHandle connectionManagerPhoneAccount, ConnectionRequest request) {
-        Bundle extra = request.getExtras();
+        Bundle extras = request.getExtras();
         Uri number = request.getAddress();
-        String name = extra.getString(EXTRA_CALLER_NAME);
+        String name = extras.getString(EXTRA_CALLER_NAME);
         Connection incomingCallConnection = createConnection(request);
         incomingCallConnection.setRinging();
         incomingCallConnection.setInitialized();
+        HashMap<String, String> extrasMap = this.bundleToMap(extras);
+        extrasMap.put(Constants.EXTRA_CALLER_HANDLE, number.toString());
+        extrasMap.put(Constants.EXTRA_CALL_FROM_PUSHKIT, "false");
+        sendCallRequestToActivity(ACTION_DISPLAY_INCOMING, extrasMap);
 
         return incomingCallConnection;
     }
