@@ -40,10 +40,9 @@ private fun isConnectionServiceAvailable(): Boolean {
 }
 
 class CallKeep(private val channel: MethodChannel, private var applicationContext: Context) : MethodChannel.MethodCallHandler, PluginRegistry.RequestPermissionsResultListener {
-    companion object {
-        var isReceiverRegistered = false
-    }
     internal var currentActivity: Activity? = null
+
+    private var isReceiverRegistered = false
 
     private var hasPhoneAccountResult: MethodChannel.Result? = null
     private var voiceBroadcastReceiver: VoiceBroadcastReceiver? = null
@@ -172,10 +171,8 @@ class CallKeep(private val channel: MethodChannel, private var applicationContex
 
         if (isConnectionServiceAvailable()) {
             registerPhoneAccount(applicationContext, imageName)
-            if (!isReceiverRegistered) {
-                voiceBroadcastReceiver = VoiceBroadcastReceiver()
-                registerReceiver()
-            }
+            voiceBroadcastReceiver = VoiceBroadcastReceiver()
+            registerReceiver()
             VoiceConnectionService.setPhoneAccountHandle(handle)
             VoiceConnectionService.setAvailable(true)
         }
