@@ -38,6 +38,11 @@ enum HandleType {
 class CallKeep {
   static const MethodChannel _channel = const MethodChannel('co.doneservices/callkeep');
 
+  static Future<String> get platformVersion async {
+    final String version = await _channel.invokeMethod('getPlatformVersion');
+    return version;
+  }
+
   static Future<bool> isCurrentDeviceSupported = _channel.invokeMethod<bool>('isCurrentDeviceSupported');
 
   static final _didReceiveStartCallAction = StreamController<StartCallAction>.broadcast();
@@ -108,6 +113,8 @@ class CallKeep {
 
   static Future<void> setup({String imageName}) async {
     _channel.setMethodCallHandler(CallKeep._emit);
+
+    if (!Platform.isAndroid) return;
 
     await _channel.invokeMethod('setup', {
       'imageName': imageName,
