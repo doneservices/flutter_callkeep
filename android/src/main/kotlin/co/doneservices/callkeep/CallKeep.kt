@@ -69,7 +69,7 @@ class CallKeep(private val channel: MethodChannel, private var applicationContex
                 result.success(null)
             }
             "displayIncomingCall" -> {
-                displayIncomingCall(call.argument("uuid")!!, call.argument("number"), call.argument("callerName"))
+                displayIncomingCall(call.argument("uuid")!!, call.argument("number"), call.argument("callerName"), call.argument("handleType"), call.argument("hasVideo"), call.argument("payload"))
                 result.success(null)
             }
             "answerIncomingCall" -> {
@@ -178,15 +178,18 @@ class CallKeep(private val channel: MethodChannel, private var applicationContex
         }
     }
 
-    private fun displayIncomingCall(uuid: String, number: String?, callerName: String?) {
+    private fun displayIncomingCall(uuid: String, number: String?, callerName: String?, handleType: String?, hasVideo: Boolean?, payload: String?) {
         if (!isConnectionServiceAvailable() || !hasPhoneAccount()) return
 
-        Log.d(TAG, "displayIncomingCall number: $number, callerName: $callerName")
+        Log.d(TAG, "displayIncomingCall number: $number, callerName: $callerName, handleType: $handleType, hasVideo: $hasVideo")
         val extras = Bundle()
         val uri = Uri.fromParts(PhoneAccount.SCHEME_TEL, number, null)
         extras.putParcelable(TelecomManager.EXTRA_INCOMING_CALL_ADDRESS, uri)
         extras.putString(Constants.EXTRA_CALLER_NAME, callerName)
         extras.putString(Constants.EXTRA_CALL_UUID, uuid)
+        extras.putString(Constants.EXTRA_CALL_HANDLE_TYPE, handleType)
+        extras.putString(Constants.EXTRA_CALL_HAS_VIDEO, hasVideo.toString())
+        extras.putString(Constants.EXTRA_CALL_PAYLOAD, payload)
         telecomManager!!.addNewIncomingCall(handle, extras)
     }
 
@@ -500,6 +503,7 @@ class CallKeep(private val channel: MethodChannel, private var applicationContex
         if (isReceiverRegistered) return
 
         val intentFilter = IntentFilter()
+        intentFilter.addAction(Constants.ACTION_DISPLAY_INCOMING)
         intentFilter.addAction(Constants.ACTION_END_CALL)
         intentFilter.addAction(Constants.ACTION_ANSWER_CALL)
         intentFilter.addAction(Constants.ACTION_MUTE_CALL)
@@ -534,6 +538,16 @@ class CallKeep(private val channel: MethodChannel, private var applicationContex
                 Constants.ACTION_ANSWER_CALL -> {
                     channel.invokeMethod("performAnswerCallAction", hashMapOf(
                             "callUUID" to attributeMap?.get(Constants.EXTRA_CALL_UUID)
+                    ))
+                }
+                Constants.ACTION_DISPLAY_INCOMING -> {
+                    channel.invokeMethod("didDisplayIncomingCall", hashMapOf(
+                            "callUUID" to attributeMap?.get(Constants.EXTRA_CALL_UUID),
+                            "handle" to attributeMap?.get(Constants.EXTRA_CALLER_HANDLE),
+                            "localizedCallerName" to attributeMap?.get(Constants.EXTRA_CALLER_NAME),
+                            "hasVideo" to attributeMap?.get(Constants.EXTRA_CALL_HAS_VIDEO),
+                            "fromPushKit" to attributeMap?.get(Constants.EXTRA_CALL_FROM_PUSHKIT),
+                            "payload" to attributeMap?.get(Constants.EXTRA_CALL_PAYLOAD)
                     ))
                 }
                 Constants.ACTION_HOLD_CALL -> {

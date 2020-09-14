@@ -33,13 +33,15 @@ class DidDisplayIncomingCallEvent {
   final String localizedCallerName;
   final bool hasVideo;
   final bool fromPushKit;
+  final String payload;
 
   DidDisplayIncomingCallEvent._new(Map<dynamic, dynamic> arguments)
       : this.callUUID = arguments['callUUID'],
         this.handle = arguments['handle'],
         this.localizedCallerName = arguments['localizedCallerName'],
-        this.hasVideo = arguments['hasVideo'],
-        this.fromPushKit = arguments['fromPushKit'];
+        this.hasVideo = arguments['hasVideo'] == 'true',
+        this.fromPushKit = arguments['fromPushKit'] == 'true',
+        this.payload = arguments['payload'];
 }
 
 class DidPerformSetMutedCallAction {

@@ -175,7 +175,7 @@ class CallKeep {
   }
 
   /// Display system UI for incoming calls
-  static Future<void> displayIncomingCall(String uuid, [String number, String callerName, HandleType handleType, bool hasVideo]) async {
+  static Future<void> displayIncomingCall(String uuid, [String number, String callerName, HandleType handleType, bool hasVideo, String payload]) async {
     assert(uuid != null);
 
     await _channel.invokeMethod('displayIncomingCall', {
@@ -184,6 +184,7 @@ class CallKeep {
       'callerName': callerName,
       'handleType': describeEnum(handleType),
       'hasVideo': hasVideo,
+      'payload': payload,
     });
   }
 
