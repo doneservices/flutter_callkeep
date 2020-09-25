@@ -204,6 +204,7 @@ class CallKeep(private val channel: MethodChannel, private var applicationContex
             return
         }
         Log.d(TAG, "startCall number: $number, callerName: $callerName")
+        backToForeground()
         val extras = Bundle()
         val uri = Uri.fromParts(PhoneAccount.SCHEME_TEL, number, null)
         val callExtras = Bundle()
@@ -394,6 +395,22 @@ class CallKeep(private val channel: MethodChannel, private var applicationContex
         }
 
         result.success(null)
+    }
+
+    private fun backToForeground() {
+        val activity = currentActivity
+
+        val packageName = applicationContext.packageName
+        val focusIntent = applicationContext.packageManager.getLaunchIntentForPackage(packageName)!!.cloneFilter()
+
+        focusIntent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
+
+        if (activity != null) {
+            activity.startActivity(focusIntent)
+        } else {
+            focusIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            applicationContext.startActivity(focusIntent)
+        }
     }
 
     private fun displayCustomIncomingCall(packageName: String, className: String, icon: String, extra: HashMap<String, String>, contentTitle: String, answerText: String, declineText: String, ringtoneUri: String?) {
