@@ -527,6 +527,8 @@ class CallKeep(private val channel: MethodChannel, private var applicationContex
         intentFilter.addAction(Constants.ACTION_ONGOING_CALL)
         intentFilter.addAction(Constants.ACTION_AUDIO_SESSION)
         intentFilter.addAction(Constants.ACTION_CHECK_REACHABILITY)
+        intentFilter.addAction(Constants.ACTION_CONNECTING)
+
         LocalBroadcastManager.getInstance(applicationContext).registerReceiver(voiceBroadcastReceiver!!, intentFilter)
 
         isReceiverRegistered = true
@@ -582,6 +584,10 @@ class CallKeep(private val channel: MethodChannel, private var applicationContex
                             "digits" to attributeMap?.get("DTMF"),
                             "callUUID" to attributeMap?.get(Constants.EXTRA_CALL_UUID)
                     ))
+                }
+                Constants.ACTION_CONNECTING -> {
+                    Log.i(TAG, "Start action: ${intent.action}")
+                    backToForeground()
                 }
                 Constants.ACTION_ONGOING_CALL -> {
                     channel.invokeMethod("didReceiveStartCallAction", hashMapOf(

@@ -52,6 +52,7 @@ import java.util.stream.Collectors;
 import static io.wazo.callkeep.Constants.ACTION_AUDIO_SESSION;
 import static io.wazo.callkeep.Constants.ACTION_ONGOING_CALL;
 import static io.wazo.callkeep.Constants.ACTION_CHECK_REACHABILITY;
+import static io.wazo.callkeep.Constants.ACTION_CONNECTING;
 import static io.wazo.callkeep.Constants.ACTION_WAKE_APP;
 import static io.wazo.callkeep.Constants.EXTRA_CALLER_NAME;
 import static io.wazo.callkeep.Constants.EXTRA_CALL_NUMBER;
@@ -247,7 +248,7 @@ public class VoiceConnectionService extends ConnectionService {
         }
         List<Connection> conferenceConnections = new ArrayList<Connection>(otherConnections.values());
         connection.setConferenceableConnections(conferenceConnections);
-
+        sendCallRequestToActivity(ACTION_CONNECTING, null);
         return connection;
     }
 
