@@ -6,3 +6,4 @@
 
 build/
 example/.flutter-plugins-dependencies
+.last_build_id
