@@ -204,6 +204,7 @@ class CallKeep(private val channel: MethodChannel, private var applicationContex
             return
         }
         Log.d(TAG, "startCall number: $number, callerName: $callerName")
+        backToForeground()
         val extras = Bundle()
         val uri = Uri.fromParts(PhoneAccount.SCHEME_TEL, number, null)
         val callExtras = Bundle()
@@ -396,6 +397,22 @@ class CallKeep(private val channel: MethodChannel, private var applicationContex
         result.success(null)
     }
 
+    private fun backToForeground() {
+        val activity = currentActivity
+
+        val packageName = applicationContext.packageName
+        val focusIntent = applicationContext.packageManager.getLaunchIntentForPackage(packageName)!!.cloneFilter()
+
+        focusIntent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
+
+        if (activity != null) {
+            activity.startActivity(focusIntent)
+        } else {
+            focusIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            applicationContext.startActivity(focusIntent)
+        }
+    }
+
     private fun displayCustomIncomingCall(packageName: String, className: String, icon: String, extra: HashMap<String, String>, contentTitle: String, answerText: String, declineText: String, ringtoneUri: String?) {
         val notificationManager = applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
@@ -510,6 +527,8 @@ class CallKeep(private val channel: MethodChannel, private var applicationContex
         intentFilter.addAction(Constants.ACTION_ONGOING_CALL)
         intentFilter.addAction(Constants.ACTION_AUDIO_SESSION)
         intentFilter.addAction(Constants.ACTION_CHECK_REACHABILITY)
+        intentFilter.addAction(Constants.ACTION_CONNECTING)
+
         LocalBroadcastManager.getInstance(applicationContext).registerReceiver(voiceBroadcastReceiver!!, intentFilter)
 
         isReceiverRegistered = true
@@ -565,6 +584,10 @@ class CallKeep(private val channel: MethodChannel, private var applicationContex
                             "digits" to attributeMap?.get("DTMF"),
                             "callUUID" to attributeMap?.get(Constants.EXTRA_CALL_UUID)
                     ))
+                }
+                Constants.ACTION_CONNECTING -> {
+                    Log.i(TAG, "Start action: ${intent.action}")
+                    backToForeground()
                 }
                 Constants.ACTION_ONGOING_CALL -> {
                     channel.invokeMethod("didReceiveStartCallAction", hashMapOf(

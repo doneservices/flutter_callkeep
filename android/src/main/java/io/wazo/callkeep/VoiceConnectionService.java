@@ -52,6 +52,7 @@ import java.util.stream.Collectors;
 import static io.wazo.callkeep.Constants.ACTION_AUDIO_SESSION;
 import static io.wazo.callkeep.Constants.ACTION_ONGOING_CALL;
 import static io.wazo.callkeep.Constants.ACTION_CHECK_REACHABILITY;
+import static io.wazo.callkeep.Constants.ACTION_CONNECTING;
 import static io.wazo.callkeep.Constants.ACTION_WAKE_APP;
 import static io.wazo.callkeep.Constants.EXTRA_CALLER_NAME;
 import static io.wazo.callkeep.Constants.EXTRA_CALL_NUMBER;
@@ -138,7 +139,7 @@ public class VoiceConnectionService extends ConnectionService {
             this.currentConnectionRequest = request;
             this.checkReachability();
         }
-
+        final Context contextApp = this.getApplicationContext();
         return this.makeOutgoingCall(request, uuid, false);
     }
 
@@ -156,10 +157,13 @@ public class VoiceConnectionService extends ConnectionService {
         if (!isForeground || forceWakeUp) {
             Log.d(TAG, "onCreateOutgoingConnection: Waking up application");
             this.wakeUpApplication(uuid, number, displayName);
+            this.backToForegroundApp(this.getApplicationContext());
         } else if (!this.canMakeOutgoingCall() && isReachable) {
             Log.d(TAG, "onCreateOutgoingConnection: not available");
             return Connection.createFailedConnection(new DisconnectCause(DisconnectCause.LOCAL));
         }
+
+
 
         // TODO: Hold all other calls
         if (extrasNumber == null || !extrasNumber.equals(number)) {
@@ -179,22 +183,47 @@ public class VoiceConnectionService extends ConnectionService {
             outgoingCallConnection.setInitialized();
         }
 
-        HashMap<String, String> extrasMap = this.bundleToMap(extras);
+        final HashMap<String, String> extrasMap = this.bundleToMap(extras);
 
-        sendCallRequestToActivity(ACTION_ONGOING_CALL, extrasMap);
-        sendCallRequestToActivity(ACTION_AUDIO_SESSION, extrasMap);
+        if (!isForeground) {
+            Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    Log.i(TAG, "Esperei para notificar o app");
+                    sendCallRequestToActivity(ACTION_ONGOING_CALL, extrasMap);
+                    sendCallRequestToActivity(ACTION_AUDIO_SESSION, extrasMap);
+                }
+            }, 4000);
+        } else {
+            sendCallRequestToActivity(ACTION_ONGOING_CALL, extrasMap);
+            sendCallRequestToActivity(ACTION_AUDIO_SESSION, extrasMap);
+        }
+        
 
         Log.d(TAG, "onCreateOutgoingConnection: calling");
 
         return outgoingCallConnection;
     }
 
+    private void backToForegroundApp(Context context) {
+        Intent intent = context.getPackageManager().getLaunchIntentForPackage(context.getPackageName());
+        intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+        intent.addFlags(Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
+        intent.addFlags(Intent.FLAG_ACTIVITY_PREVIOUS_IS_TOP);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        context.startActivity(intent);
+    }
+
     private void wakeUpApplication(String uuid, String number, String displayName) {
+        Log.d(TAG, "wakeUpApplication: start");
         HashMap<String, String> extrasMap = new HashMap();
         extrasMap.put(EXTRA_CALL_UUID, uuid);
         extrasMap.put(EXTRA_CALLER_NAME, displayName);
         extrasMap.put(EXTRA_CALL_NUMBER, number);
+        sendCallRequestToActivity(ACTION_CONNECTING, extrasMap);
         sendCallRequestToActivity(ACTION_WAKE_APP, extrasMap);
+        Log.d(TAG, "wakeUpApplication: end");
     }
 
     private void wakeUpAfterReachabilityTimeout(ConnectionRequest request) {
@@ -247,7 +276,7 @@ public class VoiceConnectionService extends ConnectionService {
         }
         List<Connection> conferenceConnections = new ArrayList<Connection>(otherConnections.values());
         connection.setConferenceableConnections(conferenceConnections);
-
+        sendCallRequestToActivity(ACTION_CONNECTING, null);
         return connection;
     }
 
@@ -309,6 +338,7 @@ public class VoiceConnectionService extends ConnectionService {
      * @return boolean
      */
     public static boolean isRunning(Context context) {
+        Log.e(TAG, "start isRunning");
         ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
         List<RunningTaskInfo> tasks = activityManager.getRunningTasks(Integer.MAX_VALUE);
 

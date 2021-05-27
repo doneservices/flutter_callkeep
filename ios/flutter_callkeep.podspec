@@ -16,5 +16,5 @@ iOS CallKit and Android ConnectionService bindings for Flutter
   s.public_header_files = 'Classes/**/*.h'
   s.dependency 'Flutter'
 
-  s.ios.deployment_target = '10.0'
+  s.ios.deployment_target = '9.0'
 end
