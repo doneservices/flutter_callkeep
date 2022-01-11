@@ -1,3 +1,7 @@
+## 0.2.0
+
+- Migrate to null safety
+
 ## 0.1.9
 
 - (android) Upgrade to v2 embedding and Gradle 7.0.2

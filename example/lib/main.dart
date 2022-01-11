@@ -26,7 +26,7 @@ class MyApp extends StatelessWidget {
       body: Center(
           child: Column(
         children: <Widget>[
-          RaisedButton(
+          ElevatedButton(
             child: Text('Display incoming call'),
             onPressed: () => this.displayIncomingCall(context),
           )
