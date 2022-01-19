@@ -1,3 +1,7 @@
+## 0.2.1
+
+- (android) Replace jcenter with mavenCentral
+
 ## 0.2.0
 
 - Migrate to null safety
