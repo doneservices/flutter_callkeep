@@ -1,3 +1,7 @@
+## 0.2.2
+
+- (android) Fix override parameters for Flutter 3.0 support
+
 ## 0.2.1
 
 - (android) Replace jcenter with mavenCentral

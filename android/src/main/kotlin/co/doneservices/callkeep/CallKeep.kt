@@ -591,7 +591,7 @@ class CallKeep(private val channel: MethodChannel, private var applicationContex
         }
     }
 
-    override fun onRequestPermissionsResult(requestCode: Int, grantedPermissions: Array<out String>?, grantResults: IntArray?): Boolean {
+    override fun onRequestPermissionsResult(requestCode: Int, grantedPermissions: Array<out String>, grantResults: IntArray): Boolean {
         if (requestCode != REQUEST_READ_PHONE_STATE) {
             return false
         }
