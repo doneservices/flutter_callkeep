@@ -613,10 +613,6 @@ class CallKeep(private val channel: MethodChannel, private var applicationContex
     }
 
     private fun getPendingIntentActivity(context: Context?, id: Int, intent: Intent?, flag: Int): PendingIntent {
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            PendingIntent.getActivity(context, id, intent, PendingIntent.FLAG_MUTABLE or flag)
-        } else {
-            PendingIntent.getActivity(context, id, intent, flag)
-        }
+        return PendingIntent.getActivity(context, id, intent, if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.S )  PendingIntent.FLAG_MUTABLE or flag else flag)
     }
 }
