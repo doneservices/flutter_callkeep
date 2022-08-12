@@ -1,3 +1,7 @@
+## 0.2.3
+
+- (android) Fix PendingIntent missing mutability flag error on API 31+
+
 ## 0.2.2
 
 - (android) Fix override parameters for Flutter 3.0 support
