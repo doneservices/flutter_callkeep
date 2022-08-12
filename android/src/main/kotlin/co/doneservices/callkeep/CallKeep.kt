@@ -14,6 +14,7 @@ import android.os.Bundle
 import android.telecom.*
 import android.telephony.TelephonyManager
 import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
@@ -428,7 +429,8 @@ class CallKeep(private val channel: MethodChannel, private var applicationContex
             notificationManager.createNotificationChannel(channel)
         }
 
-        val pendingIntent = PendingIntent.getActivity(applicationContext, 0, launchIntent, PendingIntent.FLAG_CANCEL_CURRENT)
+        val pendingIntent = getPendingIntentActivity(applicationContext, 0, launchIntent, PendingIntent.FLAG_CANCEL_CURRENT)
+
         val builder = NotificationCompat.Builder(applicationContext, "incoming_calls")
 
         builder.setSmallIcon(applicationContext.resources.getIdentifier(icon, "drawable", applicationContext.packageName))
@@ -444,8 +446,8 @@ class CallKeep(private val channel: MethodChannel, private var applicationContex
         }
 
         builder.setContentTitle(contentTitle)
-        builder.addAction(0, declineText, PendingIntent.getActivity(applicationContext, 1, declineIntent, PendingIntent.FLAG_CANCEL_CURRENT))
-        builder.addAction(0, answerText, PendingIntent.getActivity(applicationContext, 2, answerIntent, PendingIntent.FLAG_CANCEL_CURRENT))
+        builder.addAction(0, declineText, getPendingIntentActivity(applicationContext, 1, declineIntent, PendingIntent.FLAG_CANCEL_CURRENT))
+        builder.addAction(0, answerText, getPendingIntentActivity(applicationContext, 2, answerIntent, PendingIntent.FLAG_CANCEL_CURRENT))
 
         notificationManager.notify(NOTIFICATION_ID, builder.build())
     }
@@ -608,5 +610,13 @@ class CallKeep(private val channel: MethodChannel, private var applicationContex
         hasPhoneAccountResult = null
 
         return true
+    }
+
+    fun getPendingIntentActivity(context: Context?, id: Int, intent: Intent?, flag: Int): PendingIntent {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            PendingIntent.getActivity(context, id, intent, PendingIntent.FLAG_MUTABLE or flag)
+        } else {
+            PendingIntent.getActivity(context, id, intent, flag)
+        }
     }
 }
