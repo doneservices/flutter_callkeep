@@ -45,7 +45,7 @@ class CallKeepBroadcastReceiver : BroadcastReceiver() {
         const val EXTRA_CALLKEEP_IS_SHOW_LOGO = "EXTRA_CALLKEEP_IS_SHOW_LOGO"
         const val EXTRA_CALLKEEP_IS_SHOW_MISSED_CALL_NOTIFICATION = "EXTRA_CALLKEEP_IS_SHOW_MISSED_CALL_NOTIFICATION"
         const val EXTRA_CALLKEEP_IS_SHOW_CALLBACK = "EXTRA_CALLKEEP_IS_SHOW_CALLBACK"
-        const val EXTRA_CALLKEEP_RINGTONE_PATH = "EXTRA_CALLKEEP_RINGTONE_PATH"
+        const val EXTRA_CALLKEEP_RINGTONE_FILE_NAME = "EXTRA_CALLKEEP_RINGTONE_FILE_NAME"
         const val EXTRA_CALLKEEP_BACKGROUND_COLOR = "EXTRA_CALLKEEP_BACKGROUND_COLOR"
         const val EXTRA_CALLKEEP_BACKGROUND_URL = "EXTRA_CALLKEEP_BACKGROUND_URL"
         const val EXTRA_CALLKEEP_ACTION_COLOR = "EXTRA_CALLKEEP_ACTION_COLOR"
@@ -189,7 +189,7 @@ class CallKeepBroadcastReceiver : BroadcastReceiver() {
     private fun sendEventFlutter(event: String, data: Bundle) {
         val android = mapOf(
                 "showCustomNotification" to data.getBoolean(EXTRA_CALLKEEP_IS_CUSTOM_NOTIFICATION, false),
-                "ringtonePath" to data.getString(EXTRA_CALLKEEP_RINGTONE_PATH, ""),
+                "ringtoneFileName" to data.getString(EXTRA_CALLKEEP_RINGTONE_FILE_NAME, ""),
                 "backgroundColor" to data.getString(EXTRA_CALLKEEP_BACKGROUND_COLOR, ""),
                 "backgroundUrl" to data.getString(EXTRA_CALLKEEP_BACKGROUND_URL, ""),
                 "actionColor" to data.getString(EXTRA_CALLKEEP_ACTION_COLOR, ""),

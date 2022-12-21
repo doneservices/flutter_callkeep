@@ -67,7 +67,7 @@ class CallKeepSoundPlayerService : Service() {
     private fun playSound(intent: Intent?) {
         this.data = intent?.extras
         val sound = this.data?.getString(
-                CallKeepBroadcastReceiver.EXTRA_CALLKEEP_RINGTONE_PATH,
+                CallKeepBroadcastReceiver.EXTRA_CALLKEEP_RINGTONE_FILE_NAME,
                 ""
         )
         var uri = sound?.let { getRingtoneUri(it) }

@@ -125,7 +125,7 @@ public class Call: NSObject {
     @objc public var appName: String
     @objc public var handle: String
     @objc public var avatar: String
-    @objc public var type: Int
+    @objc public var type: Bool
     @objc public var duration: Int
     @objc public var extra: NSDictionary
     
@@ -146,13 +146,13 @@ public class Call: NSObject {
     @objc public var audioSessionPreferredSampleRate: Double
     @objc public var audioSessionPreferredIOBufferDuration: Double
     
-    @objc public init(id: String, callerName: String, handle: String, type: Int) {
+    @objc public init(id: String, callerName: String, handle: String, hasVideo: Bool) {
         self.uuid = id
         self.callerName = callerName
         self.appName = "Callkit"
         self.handle = handle
         self.avatar = ""
-        self.type = type
+        self.hasVideo = hasVideo
         self.duration = 30000
         self.extra = [:]
         self.iconName = "CallKitLogo"
@@ -186,7 +186,7 @@ public class Call: NSObject {
         self.appName = args["appName"] as? String ?? "Callkit"
         self.handle = args["handle"] as? String ?? ""
         self.avatar = args["avatar"] as? String ?? ""
-        self.type = args["type"] as? Int ?? 0
+        self.hasVideo = args["hasVideo"] as? Bool ?? false
         self.duration = args["duration"] as? Int ?? 30000
         self.extra = args["extra"] as? NSDictionary ?? [:]
         
@@ -251,7 +251,7 @@ public class Call: NSObject {
             "appName": appName,
             "handle": handle,
             "avatar": avatar,
-            "type": type,
+            "hasVideo": hasVideo,
             "duration": duration,
             "extra": extra,
             "ios": ios
