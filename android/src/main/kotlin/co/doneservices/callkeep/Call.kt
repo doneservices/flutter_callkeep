@@ -28,12 +28,12 @@ data class Data(val args: Map<String, Any?>) {
 
     var showCustomNotification: Boolean = false
     var showLogo: Boolean = false
-    var isShowCallback: Boolean = true
-    var ringtonePath: String
+    var showCallBackAction: Boolean = true
+    var ringtoneFileName: String
     var backgroundColor: String
     var backgroundUrl: String
     var actionColor: String
-    var isShowMissedCallNotification: Boolean = true
+    var showMissedCallNotification: Boolean = true
     var incomingCallNotificationChannelName: String? = null
     var missedCallNotificationChannelName: String? = null
 
@@ -44,23 +44,23 @@ data class Data(val args: Map<String, Any?>) {
         if (android != null) {
             showCustomNotification = (android["showCustomNotification"] as? Boolean) ?: false
             showLogo = (android["showLogo"] as? Boolean) ?: false
-            isShowCallback = (android["isShowCallback"] as? Boolean) ?: true
-            ringtonePath = (android["ringtonePath"] as? String) ?: ""
+            showCallBackAction = (android["showCallBackAction"] as? Boolean) ?: true
+            ringtoneFileName = (android["ringtoneFileName"] as? String) ?: ""
             backgroundColor = (android["backgroundColor"] as? String) ?: "#0955fa"
             backgroundUrl = (android["backgroundUrl"] as? String) ?: ""
             actionColor = (android["actionColor"] as? String) ?: "#4CAF50"
-            isShowMissedCallNotification = (android["isShowMissedCallNotification"] as? Boolean) ?: true
+            showMissedCallNotification = (android["showMissedCallNotification"] as? Boolean) ?: true
             incomingCallNotificationChannelName = android["incomingCallNotificationChannelName"] as? String
             missedCallNotificationChannelName = android["missedCallNotificationChannelName"] as? String
         } else {
             showCustomNotification = (args["showCustomNotification"] as? Boolean) ?: false
             showLogo = (args["showLogo"] as? Boolean) ?: false
-            isShowCallback = (args["isShowCallback"] as? Boolean) ?: true
-            ringtonePath = (args["ringtonePath"] as? String) ?: ""
+            showCallBackAction = (args["showCallBackAction"] as? Boolean) ?: true
+            ringtoneFileName = (args["ringtoneFileName"] as? String) ?: ""
             backgroundColor = (args["backgroundColor"] as? String) ?: "#0955fa"
             backgroundUrl = (args["backgroundUrl"] as? String) ?: ""
             actionColor = (args["actionColor"] as? String) ?: "#4CAF50"
-            isShowMissedCallNotification = (args["isShowMissedCallNotification"] as? Boolean) ?: true
+            showMissedCallNotification = (args["showMissedCallNotification"] as? Boolean) ?: true
         }
     }
 
@@ -99,9 +99,9 @@ data class Data(val args: Map<String, Any?>) {
         )
         bundle.putBoolean(
                 CallKeepBroadcastReceiver.EXTRA_CALLKEEP_IS_SHOW_CALLBACK,
-                isShowCallback
+                showCallBackAction
         )
-        bundle.putString(CallKeepBroadcastReceiver.EXTRA_CALLKEEP_RINGTONE_PATH, ringtonePath)
+        bundle.putString(CallKeepBroadcastReceiver.EXTRA_CALLKEEP_RINGTONE_FILE_NAME, ringtoneFileName)
         bundle.putString(
                 CallKeepBroadcastReceiver.EXTRA_CALLKEEP_BACKGROUND_COLOR,
                 backgroundColor
@@ -114,7 +114,7 @@ data class Data(val args: Map<String, Any?>) {
         bundle.putString(CallKeepBroadcastReceiver.EXTRA_CALLKEEP_ACTION_FROM, from)
         bundle.putBoolean(
                 CallKeepBroadcastReceiver.EXTRA_CALLKEEP_IS_SHOW_MISSED_CALL_NOTIFICATION,
-                isShowMissedCallNotification
+                showMissedCallNotification
         )
         bundle.putString(
             CallKeepBroadcastReceiver.EXTRA_CALLKEEP_INCOMING_CALL_NOTIFICATION_CHANNEL_NAME,
@@ -164,12 +164,12 @@ data class Data(val args: Map<String, Any?>) {
                     CallKeepBroadcastReceiver.EXTRA_CALLKEEP_IS_SHOW_LOGO,
                     false
             )
-            data.isShowCallback = bundle.getBoolean(
+            data.showCallBackAction = bundle.getBoolean(
                     CallKeepBroadcastReceiver.EXTRA_CALLKEEP_IS_SHOW_CALLBACK,
                     true
             )
-            data.ringtonePath = bundle.getString(
-                    CallKeepBroadcastReceiver.EXTRA_CALLKEEP_RINGTONE_PATH,
+            data.ringtoneFileName = bundle.getString(
+                    CallKeepBroadcastReceiver.EXTRA_CALLKEEP_RINGTONE_FILE_NAME,
                     ""
             )
             data.backgroundColor = bundle.getString(
@@ -184,7 +184,7 @@ data class Data(val args: Map<String, Any?>) {
             )
             data.from =
                     bundle.getString(CallKeepBroadcastReceiver.EXTRA_CALLKEEP_ACTION_FROM, "")
-            data.isShowMissedCallNotification = bundle.getBoolean(
+            data.showMissedCallNotification = bundle.getBoolean(
                     CallKeepBroadcastReceiver.EXTRA_CALLKEEP_IS_SHOW_MISSED_CALL_NOTIFICATION,
                     true
             )

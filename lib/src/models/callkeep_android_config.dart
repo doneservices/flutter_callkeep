@@ -21,7 +21,7 @@ class CallKeepAndroidConfig {
   final bool showMissedCallNotification;
 
   /// Show call back action on missed call notifications
-  final bool showCallbackAction;
+  final bool showCallBackAction;
 
   /// File name of the ringtone that is put into /android/app/src/main/res/raw/
   final String ringtoneFileName;
@@ -52,7 +52,7 @@ class CallKeepAndroidConfig {
     this.showCustomNotification = false,
     this.showLogo = false,
     this.showMissedCallNotification = true,
-    this.showCallbackAction = true,
+    this.showCallBackAction = true,
     this.ringtoneFileName = 'system_ringtone_default',
     this.backgroundColor = '#0955fa',
     this.backgroundUrl,
@@ -70,7 +70,7 @@ class CallKeepAndroidConfig {
       'showCustomNotification': showCustomNotification,
       'showLogo': showLogo,
       'showMissedCallNotification': showMissedCallNotification,
-      'showCallbackAction': showCallbackAction,
+      'showCallBackAction': showCallBackAction,
       'ringtoneFileName': ringtoneFileName,
       'backgroundColor': backgroundColor,
       'backgroundUrl': backgroundUrl,

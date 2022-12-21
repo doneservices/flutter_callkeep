@@ -276,8 +276,8 @@ public class SwiftCallKeepPlugin: NSObject, FlutterPlugin, CXProviderDelegate {
                 print("Unable to load icon \(data.iconName).");
             }
         }
-        if !data.ringtonePath.isEmpty || data.ringtonePath != "system_ringtone_default"  {
-            configuration.ringtoneSound = data.ringtonePath
+        if !data.ringtoneFileName.isEmpty || data.ringtoneFileName != "system_ringtone_default"  {
+            configuration.ringtoneSound = data.ringtoneFileName
         }
         return configuration
     }

@@ -261,8 +261,8 @@ class CallkitNotificationManager(private val context: Context) {
                     R.id.llCallback,
                     getCallbackPendingIntent(notificationId, data)
             )
-            val isShowCallback = data.getBoolean(CallKeepBroadcastReceiver.EXTRA_CALLKEEP_IS_SHOW_CALLBACK, true)
-            notificationViews?.setViewVisibility(R.id.llCallback, if (isShowCallback) View.VISIBLE else View.GONE)
+            val showCallBackAction = data.getBoolean(CallKeepBroadcastReceiver.EXTRA_CALLKEEP_IS_SHOW_CALLBACK, true)
+            notificationViews?.setViewVisibility(R.id.llCallback, if (showCallBackAction) View.VISIBLE else View.GONE)
             val callBackText = data.getString(EXTRA_CALLKEEP_TEXT_CALLBACK, "")
             notificationViews?.setTextViewText(R.id.tvCallback, if (TextUtils.isEmpty(callBackText)) context.getString(R.string.text_call_back) else callBackText)
 
@@ -288,8 +288,8 @@ class CallkitNotificationManager(private val context: Context) {
                 getPicassoInstance(context, headers).load(avatarUrl)
                         .into(targetLoadAvatarDefault)
             }
-            val isShowCallback = data.getBoolean(CallKeepBroadcastReceiver.EXTRA_CALLKEEP_IS_SHOW_CALLBACK, true)
-            if (isShowCallback) {
+            val showCallBackAction = data.getBoolean(CallKeepBroadcastReceiver.EXTRA_CALLKEEP_IS_SHOW_CALLBACK, true)
+            if (showCallBackAction) {
                 val callBackText = data.getString(EXTRA_CALLKEEP_TEXT_CALLBACK, "")
                 val callbackAction: NotificationCompat.Action = NotificationCompat.Action.Builder(
                         R.drawable.ic_accept,

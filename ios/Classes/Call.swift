@@ -140,7 +140,7 @@ public class Call: NSObject {
     @objc public var supportsGrouping: Bool
     @objc public var supportsUngrouping: Bool
     @objc public var includesCallsInRecents: Bool
-    @objc public var ringtonePath: String
+    @objc public var ringtoneFileName: String
     @objc public var audioSessionMode: String
     @objc public var audioSessionActive: Bool
     @objc public var audioSessionPreferredSampleRate: Double
@@ -165,7 +165,7 @@ public class Call: NSObject {
         self.supportsGrouping = true
         self.supportsUngrouping = true
         self.includesCallsInRecents = true
-        self.ringtonePath = ""
+        self.ringtoneFileName = ""
         self.audioSessionMode = ""
         self.audioSessionActive = true
         self.audioSessionPreferredSampleRate = 44100.0
@@ -202,7 +202,7 @@ public class Call: NSObject {
             self.supportsGrouping = ios["supportsGrouping"] as? Bool ?? true
             self.supportsUngrouping = ios["supportsUngrouping"] as? Bool ?? true
             self.includesCallsInRecents = ios["includesCallsInRecents"] as? Bool ?? true
-            self.ringtonePath = ios["ringtonePath"] as? String ?? ""
+            self.ringtoneFileName = ios["ringtoneFileName"] as? String ?? ""
             self.audioSessionMode = ios["audioSessionMode"] as? String ?? ""
             self.audioSessionActive = ios["audioSessionActive"] as? Bool ?? true
             self.audioSessionPreferredSampleRate = ios["audioSessionPreferredSampleRate"] as? Double ?? 44100.0
@@ -218,7 +218,7 @@ public class Call: NSObject {
             self.supportsGrouping = args["supportsGrouping"] as? Bool ?? true
             self.supportsUngrouping = args["supportsUngrouping"] as? Bool ?? true
             self.includesCallsInRecents = args["includesCallsInRecents"] as? Bool ?? true
-            self.ringtonePath = args["ringtonePath"] as? String ?? ""
+            self.ringtoneFileName = args["ringtoneFileName"] as? String ?? ""
             self.audioSessionMode = args["audioSessionMode"] as? String ?? ""
             self.audioSessionActive = args["audioSessionActive"] as? Bool ?? true
             self.audioSessionPreferredSampleRate = args["audioSessionPreferredSampleRate"] as? Double ?? 44100.0
@@ -238,7 +238,7 @@ public class Call: NSObject {
             "supportsGrouping": supportsGrouping,
             "supportsUngrouping": supportsUngrouping,
             "includesCallsInRecents": includesCallsInRecents,
-            "ringtonePath": ringtonePath,
+            "ringtoneFileName": ringtoneFileName,
             "audioSessionMode": audioSessionMode,
             "audioSessionActive": audioSessionActive,
             "audioSessionPreferredSampleRate": audioSessionPreferredSampleRate,
