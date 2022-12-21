@@ -56,7 +56,7 @@ Future<void> displayIncomingCall(String uuid) async {
       ringtoneFileName: 'system_ringtone_default',
     ),
   );
-  await FlutterCallKeep.instance.displayIncomingCall(config);
+  await CallKeep.instance.displayIncomingCall(config);
 }
 
 void main() {
@@ -87,7 +87,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
 
   getCurrentCall() async {
     //check current call from pushkit if possible
-    var calls = await FlutterCallKeep.instance.activeCalls();
+    var calls = await CallKeep.instance.activeCalls();
     if (calls.isNotEmpty) {
       print('DATA: $calls');
       _currentUuid = calls[0].uuid;
@@ -147,7 +147,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   }
 
   Future<void> getDevicePushTokenVoIP() async {
-    var devicePushTokenVoIP = await FlutterCallKeep.instance.getDevicePushTokenVoIP();
+    var devicePushTokenVoIP = await CallKeep.instance.getDevicePushTokenVoIP();
     print(devicePushTokenVoIP);
   }
 }

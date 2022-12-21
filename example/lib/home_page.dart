@@ -95,7 +95,7 @@ class HomePageState extends State<HomePage> {
 
   initCurrentCall() async {
     //check current call from pushkit if possible
-    var calls = await FlutterCallKeep.instance.activeCalls();
+    var calls = await CallKeep.instance.activeCalls();
     if (calls.isNotEmpty) {
       print('DATA: $calls');
       _currentUuid = calls[0].uuid;
@@ -149,13 +149,13 @@ class HomePageState extends State<HomePage> {
           ringtoneFileName: 'system_ringtone_default',
         ),
       );
-      await FlutterCallKeep.instance.displayIncomingCall(config);
+      await CallKeep.instance.displayIncomingCall(config);
     });
   }
 
   Future<void> endCurrentCall() async {
     initCurrentCall();
-    await FlutterCallKeep.instance.endCall(_currentUuid!);
+    await CallKeep.instance.endCall(_currentUuid!);
   }
 
   Future<void> startOutGoingCall() async {
@@ -168,31 +168,31 @@ class HomePageState extends State<HomePage> {
       extra: <String, dynamic>{'userId': '1a2b3c4d'},
       iosConfig: CallKeepIosConfig(handleType: CallKitHandleType.number),
     );
-    await FlutterCallKeep.instance.startCall(params);
+    await CallKeep.instance.startCall(params);
   }
 
   Future<void> activeCalls() async {
-    var calls = await FlutterCallKeep.instance.activeCalls();
+    var calls = await CallKeep.instance.activeCalls();
     print(calls);
   }
 
   Future<void> endAllCalls() async {
-    await FlutterCallKeep.instance.endAllCalls();
+    await CallKeep.instance.endAllCalls();
   }
 
   Future<void> getDevicePushTokenVoIP() async {
-    var devicePushTokenVoIP = await FlutterCallKeep.instance.getDevicePushTokenVoIP();
+    var devicePushTokenVoIP = await CallKeep.instance.getDevicePushTokenVoIP();
     print(devicePushTokenVoIP);
   }
 
   Future<void> listenerEvent(Function? callback) async {
     // TODO: Implement other listeners
     try {
-      FlutterCallKeep.instance.onCallAccepted.listen((data) {
+      CallKeep.instance.onCallAccepted.listen((data) {
         NavigationService.instance.pushNamedIfNotCurrent(AppRoute.callingPage, args: data.toMap());
         if (callback != null) callback.call();
       });
-      FlutterCallKeep.instance.onCallDeclined.listen((data) async {
+      CallKeep.instance.onCallDeclined.listen((data) async {
         await requestHttp("ACTION_CALL_DECLINE_FROM_DART");
         if (callback != null) callback.call();
       });

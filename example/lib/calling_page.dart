@@ -38,7 +38,7 @@ class CallingPageState extends State<CallingPage> {
                 ),
                 onPressed: () async {
                   if (calling != null) {
-                    FlutterCallKeep.instance.endCall(calling!.uuid);
+                    CallKeep.instance.endCall(calling!.uuid);
                     calling = null;
                   }
                   NavigationService.instance.goBack();
@@ -61,6 +61,6 @@ class CallingPageState extends State<CallingPage> {
   @override
   void dispose() {
     super.dispose();
-    if (calling != null) FlutterCallKeep.instance.endCall(calling!.uuid);
+    if (calling != null) CallKeep.instance.endCall(calling!.uuid);
   }
 }

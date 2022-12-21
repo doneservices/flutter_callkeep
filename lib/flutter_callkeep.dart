@@ -18,17 +18,17 @@ export 'package:flutter_callkeep/src/models/models.dart';
 /// * endCall(String Uuid)
 /// * endAllCalls()
 ///
-class FlutterCallKeep {
+class CallKeep {
   static const MethodChannel _channel = const MethodChannel('flutter_callkeep');
   static const EventChannel _eventChannel = const EventChannel('flutter_callkeep_events');
 
-  FlutterCallKeep._internal() {
+  CallKeep._internal() {
     _eventChannel.receiveBroadcastStream().map(_handleCallKeepEvent);
   }
 
-  static final FlutterCallKeep _instance = FlutterCallKeep._internal();
+  static final CallKeep _instance = CallKeep._internal();
 
-  static FlutterCallKeep get instance => _instance;
+  static CallKeep get instance => _instance;
 
   final StreamController<CallKeepBaseData> _incomingCallController = StreamController();
   final StreamController<CallKeepBaseData> _callStartController = StreamController();
