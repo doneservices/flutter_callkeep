@@ -1,0 +1,201 @@
+package co.doneservices.callkeep
+
+import android.os.Bundle
+
+class Call {
+}
+
+@Suppress("UNCHECKED_CAST")
+data class Data(val args: Map<String, Any?>) {
+
+    var id: String = (args["id"] as? String) ?: ""
+    var uuid: String = (args["id"] as? String) ?: ""
+    var callerName: String = (args["callerName"] as? String) ?: ""
+    var appName: String = (args["appName"] as? String) ?: ""
+    var handle: String = (args["handle"] as? String) ?: ""
+    var avatar: String = (args["avatar"] as? String) ?: ""
+    var hasVideo: Boolean = (args["hasVideo"] as? Boolean) ?: 0
+    var duration: Long = (args["duration"] as? Long) ?: ((args["duration"] as? Int)?.toLong() ?: 30000L)
+    var acceptText: String = (args["acceptText"] as? String) ?: ""
+    var declineText: String = (args["declineText"] as? String) ?: ""
+    var missedCallText: String = (args["missedCallText"] as? String) ?: ""
+    var callBackText: String = (args["callBackText"] as? String) ?: ""
+    var extra: HashMap<String, Any?> =
+            (args["extra"] ?: HashMap<String, Any?>()) as HashMap<String, Any?>
+    var headers: HashMap<String, Any?> =
+            (args["headers"] ?: HashMap<String, Any?>()) as HashMap<String, Any?>
+    var from: String = ""
+
+    var showCustomNotification: Boolean = false
+    var showLogo: Boolean = false
+    var isShowCallback: Boolean = true
+    var ringtonePath: String
+    var backgroundColor: String
+    var backgroundUrl: String
+    var actionColor: String
+    var isShowMissedCallNotification: Boolean = true
+    var incomingCallNotificationChannelName: String? = null
+    var missedCallNotificationChannelName: String? = null
+
+    var isAccepted: Boolean = false
+
+    init {
+        val android: HashMap<String, Any?>? = args["android"] as? HashMap<String, Any?>?
+        if (android != null) {
+            showCustomNotification = (android["showCustomNotification"] as? Boolean) ?: false
+            showLogo = (android["showLogo"] as? Boolean) ?: false
+            isShowCallback = (android["isShowCallback"] as? Boolean) ?: true
+            ringtonePath = (android["ringtonePath"] as? String) ?: ""
+            backgroundColor = (android["backgroundColor"] as? String) ?: "#0955fa"
+            backgroundUrl = (android["backgroundUrl"] as? String) ?: ""
+            actionColor = (android["actionColor"] as? String) ?: "#4CAF50"
+            isShowMissedCallNotification = (android["isShowMissedCallNotification"] as? Boolean) ?: true
+            incomingCallNotificationChannelName = android["incomingCallNotificationChannelName"] as? String
+            missedCallNotificationChannelName = android["missedCallNotificationChannelName"] as? String
+        } else {
+            showCustomNotification = (args["showCustomNotification"] as? Boolean) ?: false
+            showLogo = (args["showLogo"] as? Boolean) ?: false
+            isShowCallback = (args["isShowCallback"] as? Boolean) ?: true
+            ringtonePath = (args["ringtonePath"] as? String) ?: ""
+            backgroundColor = (args["backgroundColor"] as? String) ?: "#0955fa"
+            backgroundUrl = (args["backgroundUrl"] as? String) ?: ""
+            actionColor = (args["actionColor"] as? String) ?: "#4CAF50"
+            isShowMissedCallNotification = (args["isShowMissedCallNotification"] as? Boolean) ?: true
+        }
+    }
+
+    override fun hashCode(): Int {
+        return id.hashCode()
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (other == null) return false
+        val e: Data = other as Data
+        return this.id == e.id
+    }
+
+
+    fun toBundle(): Bundle {
+        val bundle = Bundle()
+        bundle.putString(CallKeepBroadcastReceiver.EXTRA_CALLKEEP_ID, id)
+        bundle.putString(CallKeepBroadcastReceiver.EXTRA_CALLKEEP_CALLER_NAME, callerName)
+        bundle.putString(CallKeepBroadcastReceiver.EXTRA_CALLKEEP_HANDLE, handle)
+        bundle.putString(CallKeepBroadcastReceiver.EXTRA_CALLKEEP_AVATAR, avatar)
+        bundle.putBoolean(CallKeepBroadcastReceiver.EXTRA_CALLKEEP_HAS_VIDEO, hasVideo)
+        bundle.putLong(CallKeepBroadcastReceiver.EXTRA_CALLKEEP_DURATION, duration)
+        bundle.putString(CallKeepBroadcastReceiver.EXTRA_CALLKEEP_TEXT_ACCEPT, acceptText)
+        bundle.putString(CallKeepBroadcastReceiver.EXTRA_CALLKEEP_TEXT_DECLINE, declineText)
+        bundle.putString(CallKeepBroadcastReceiver.EXTRA_CALLKEEP_TEXT_MISSED_CALL, missedCallText)
+        bundle.putString(CallKeepBroadcastReceiver.EXTRA_CALLKEEP_TEXT_CALLBACK, callBackText)
+        bundle.putSerializable(CallKeepBroadcastReceiver.EXTRA_CALLKEEP_EXTRA, extra)
+        bundle.putSerializable(CallKeepBroadcastReceiver.EXTRA_CALLKEEP_HEADERS, headers)
+        bundle.putBoolean(
+                CallKeepBroadcastReceiver.EXTRA_CALLKEEP_IS_CUSTOM_NOTIFICATION,
+                showCustomNotification
+        )
+        bundle.putBoolean(
+                CallKeepBroadcastReceiver.EXTRA_CALLKEEP_IS_SHOW_LOGO,
+                showLogo
+        )
+        bundle.putBoolean(
+                CallKeepBroadcastReceiver.EXTRA_CALLKEEP_IS_SHOW_CALLBACK,
+                isShowCallback
+        )
+        bundle.putString(CallKeepBroadcastReceiver.EXTRA_CALLKEEP_RINGTONE_PATH, ringtonePath)
+        bundle.putString(
+                CallKeepBroadcastReceiver.EXTRA_CALLKEEP_BACKGROUND_COLOR,
+                backgroundColor
+        )
+        bundle.putString(
+                CallKeepBroadcastReceiver.EXTRA_CALLKEEP_BACKGROUND_URL,
+                backgroundUrl
+        )
+        bundle.putString(CallKeepBroadcastReceiver.EXTRA_CALLKEEP_ACTION_COLOR, actionColor)
+        bundle.putString(CallKeepBroadcastReceiver.EXTRA_CALLKEEP_ACTION_FROM, from)
+        bundle.putBoolean(
+                CallKeepBroadcastReceiver.EXTRA_CALLKEEP_IS_SHOW_MISSED_CALL_NOTIFICATION,
+                isShowMissedCallNotification
+        )
+        bundle.putString(
+            CallKeepBroadcastReceiver.EXTRA_CALLKEEP_INCOMING_CALL_NOTIFICATION_CHANNEL_NAME,
+            incomingCallNotificationChannelName
+        )
+        bundle.putString(
+            CallKeepBroadcastReceiver.EXTRA_CALLKEEP_MISSED_CALL_NOTIFICATION_CHANNEL_NAME,
+            missedCallNotificationChannelName
+        )
+        return bundle
+    }
+
+    companion object {
+
+        fun fromBundle(bundle: Bundle): Data {
+            val data = Data(emptyMap())
+            data.id = bundle.getString(CallKeepBroadcastReceiver.EXTRA_CALLKEEP_ID, "")
+            data.callerName =
+                    bundle.getString(CallKeepBroadcastReceiver.EXTRA_CALLKEEP_CALLER_NAME, "")
+            data.appName =
+                    bundle.getString(CallKeepBroadcastReceiver.EXTRA_CALLKEEP_APP_NAME, "")
+            data.handle =
+                    bundle.getString(CallKeepBroadcastReceiver.EXTRA_CALLKEEP_HANDLE, "")
+            data.avatar =
+                    bundle.getString(CallKeepBroadcastReceiver.EXTRA_CALLKEEP_AVATAR, "")
+            data.type = bundle.getBoolean(CallKeepBroadcastReceiver.EXTRA_CALLKEEP_HAS_VIDEO, false)
+            data.duration =
+                    bundle.getLong(CallKeepBroadcastReceiver.EXTRA_CALLKEEP_DURATION, 30000L)
+            data.acceptText =
+                    bundle.getString(CallKeepBroadcastReceiver.EXTRA_CALLKEEP_TEXT_ACCEPT, "")
+            data.declineText =
+                    bundle.getString(CallKeepBroadcastReceiver.EXTRA_CALLKEEP_TEXT_DECLINE, "")
+            data.missedCallText =
+                    bundle.getString(CallKeepBroadcastReceiver.EXTRA_CALLKEEP_TEXT_MISSED_CALL, "")
+            data.callBackText =
+                    bundle.getString(CallKeepBroadcastReceiver.EXTRA_CALLKEEP_TEXT_CALLBACK, "")
+            data.extra =
+                    bundle.getSerializable(CallKeepBroadcastReceiver.EXTRA_CALLKEEP_EXTRA) as HashMap<String, Any?>
+            data.headers =
+                    bundle.getSerializable(CallKeepBroadcastReceiver.EXTRA_CALLKEEP_HEADERS) as HashMap<String, Any?>
+
+            data.showCustomNotification = bundle.getBoolean(
+                    CallKeepBroadcastReceiver.EXTRA_CALLKEEP_IS_CUSTOM_NOTIFICATION,
+                    false
+            )
+            data.showLogo = bundle.getBoolean(
+                    CallKeepBroadcastReceiver.EXTRA_CALLKEEP_IS_SHOW_LOGO,
+                    false
+            )
+            data.isShowCallback = bundle.getBoolean(
+                    CallKeepBroadcastReceiver.EXTRA_CALLKEEP_IS_SHOW_CALLBACK,
+                    true
+            )
+            data.ringtonePath = bundle.getString(
+                    CallKeepBroadcastReceiver.EXTRA_CALLKEEP_RINGTONE_PATH,
+                    ""
+            )
+            data.backgroundColor = bundle.getString(
+                    CallKeepBroadcastReceiver.EXTRA_CALLKEEP_BACKGROUND_COLOR,
+                    "#0955fa"
+            )
+            data.backgroundUrl =
+                    bundle.getString(CallKeepBroadcastReceiver.EXTRA_CALLKEEP_BACKGROUND_URL, "")
+            data.actionColor = bundle.getString(
+                    CallKeepBroadcastReceiver.EXTRA_CALLKEEP_ACTION_COLOR,
+                    "#4CAF50"
+            )
+            data.from =
+                    bundle.getString(CallKeepBroadcastReceiver.EXTRA_CALLKEEP_ACTION_FROM, "")
+            data.isShowMissedCallNotification = bundle.getBoolean(
+                    CallKeepBroadcastReceiver.EXTRA_CALLKEEP_IS_SHOW_MISSED_CALL_NOTIFICATION,
+                    true
+            )
+            data.incomingCallNotificationChannelName = bundle.getString(
+                CallKeepBroadcastReceiver.EXTRA_CALLKEEP_INCOMING_CALL_NOTIFICATION_CHANNEL_NAME
+            )
+            data.missedCallNotificationChannelName = bundle.getString(
+                CallKeepBroadcastReceiver.EXTRA_CALLKEEP_MISSED_CALL_NOTIFICATION_CHANNEL_NAME
+            )
+            return data
+        }
+    }
+
+}

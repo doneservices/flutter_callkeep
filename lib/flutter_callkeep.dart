@@ -1,272 +1,203 @@
-library flutter_callkeep;
+import 'dart:async';
 
-import 'dart:async' show Stream, StreamController;
-import 'dart:io' show Platform;
+import 'package:flutter/services.dart';
+import 'package:flutter_callkeep/src/models/calkeep_base_data.dart';
+import 'package:flutter_callkeep/src/models/call_group_toggle_data.dart';
+import 'package:flutter_callkeep/src/models/callkeep_event_type.dart';
+import 'package:flutter_callkeep/src/models/callkeep_incoming_config.dart';
+import 'package:flutter_callkeep/src/models/callkeep_outgoing_config.dart';
+import 'package:flutter_callkeep/src/models/dmtf_toggle_data.dart';
+import 'package:flutter_callkeep/src/models/hold_toggle_data.dart';
+import 'package:flutter_callkeep/src/models/mute_toggle_data.dart';
 
-import 'package:flutter/foundation.dart' show describeEnum;
-import 'package:flutter/material.dart'
-    show AlertDialog, BuildContext, Navigator, Text, TextButton, Widget, showDialog;
-import 'package:flutter/services.dart' show MethodCall, MethodChannel;
+/// Instance to use library functions.
+/// * displayIncomingCall(CallKeepIncomingConfig)
+/// * startCall(CallKeepOutgoingConfig)
+/// * endCall(String Uuid)
+/// * endAllCalls()
+///
+class FlutterCallKeep {
+  static const MethodChannel _channel = const MethodChannel('flutter_callkeep');
+  static const EventChannel _eventChannel = const EventChannel('flutter_callkeep_events');
 
-part './src/events.dart';
+  FlutterCallKeep._internal() {
+    _eventChannel.receiveBroadcastStream().map(_handleCallKeepEvent);
+  }
 
-Future<bool?> _showPermissionDialog(BuildContext context,
-    {String? alertTitle, String? alertDescription, String? cancelButton, String? okButton}) {
-  return showDialog<bool>(
-    context: context,
-    builder: (BuildContext context) => AlertDialog(
-      title: Text(alertTitle ?? 'Permissions required'),
-      content: Text(alertDescription ?? 'This application needs to access your phone accounts'),
-      actions: <Widget>[
-        TextButton(
-          child: Text(cancelButton ?? 'Cancel'),
-          onPressed: () => Navigator.of(context, rootNavigator: true).pop(false),
-        ),
-        TextButton(
-          child: Text(okButton ?? 'ok'),
-          onPressed: () => Navigator.of(context, rootNavigator: true).pop(true),
-        ),
-      ],
-    ),
-  );
-}
+  final FlutterCallKeep _instance = FlutterCallKeep._internal();
 
-enum HandleType {
-  generic,
-  number,
-  email,
-}
+  FlutterCallKeep get instance => _instance;
 
-class CallKeep {
-  static const MethodChannel _channel = const MethodChannel('co.doneservices/callkeep');
+  final StreamController<CallKeepBaseData> _incomingCallController = StreamController();
+  final StreamController<CallKeepBaseData> _callStartController = StreamController();
+  final StreamController<CallKeepBaseData> _callAcceptController = StreamController();
+  final StreamController<CallKeepBaseData> _callDeclineController = StreamController();
+  final StreamController<CallKeepBaseData> _callEndedController = StreamController();
+  final StreamController<CallKeepBaseData> _callTimeOutController = StreamController();
+  final StreamController<CallKeepBaseData> _callBackController = StreamController();
+  final StreamController<HoldToggleData> _holdToggleController = StreamController();
+  final StreamController<MuteToggleData> _muteToggleController = StreamController();
+  final StreamController<DmtfToggleData> _dmtfToggleController = StreamController();
+  final StreamController<CallGroupToggleData> _callGroupToggleController = StreamController();
+  final StreamController<bool> _audioSessionToggleController = StreamController();
+  final StreamController<String> _pushTokenUpdateController = StreamController();
 
-  static Future<bool?> isCurrentDeviceSupported =
-      _channel.invokeMethod<bool>('isCurrentDeviceSupported');
+  /// Received an incoming call
+  Stream<CallKeepBaseData> get onIncomingCall => _incomingCallController.stream.asBroadcastStream();
 
-  static final _didReceiveStartCallAction = StreamController<StartCallAction>.broadcast();
-  static final _performAnswerCallAction = StreamController<AnswerCallAction>.broadcast();
-  static final _performEndCallAction = StreamController<EndCallAction>.broadcast();
-  static final _didActivateAudioSession =
-      StreamController<DidActivateAudioSessionEvent>.broadcast();
-  static final _didDeactivateAudioSession =
-      StreamController<DidDeactivateAudioSessionEvent>.broadcast();
-  static final _didDisplayIncomingCall = StreamController<DidDisplayIncomingCallEvent>.broadcast();
-  static final _didPerformSetMutedCallAction =
-      StreamController<DidPerformSetMutedCallAction>.broadcast();
-  static final _didToggleHoldAction = StreamController<DidToggleHoldAction>.broadcast();
-  static final _didPerformDTMFAction = StreamController<DidPerformDTMFAction>.broadcast();
-  static final _providerReset = StreamController<ProviderResetEvent>.broadcast();
-  static final _checkReachability = StreamController<CheckReachabilityEvent>.broadcast();
+  /// Started an outgoing call
+  Stream<CallKeepBaseData> get onCallStarted => _callStartController.stream.asBroadcastStream();
 
-  static Stream<StartCallAction> get didReceiveStartCallAction => _didReceiveStartCallAction.stream;
-  static Stream<AnswerCallAction> get performAnswerCallAction => _performAnswerCallAction.stream;
-  static Stream<EndCallAction> get performEndCallAction => _performEndCallAction.stream;
-  static Stream<DidActivateAudioSessionEvent> get didActivateAudioSession =>
-      _didActivateAudioSession.stream;
-  static Stream<DidDeactivateAudioSessionEvent> get didDeactivateAudioSession =>
-      _didDeactivateAudioSession.stream;
-  static Stream<DidDisplayIncomingCallEvent> get didDisplayIncomingCall =>
-      _didDisplayIncomingCall.stream;
-  static Stream<DidPerformSetMutedCallAction> get didPerformSetMutedCallAction =>
-      _didPerformSetMutedCallAction.stream;
-  static Stream<DidToggleHoldAction> get didToggleHoldAction => _didToggleHoldAction.stream;
-  static Stream<DidPerformDTMFAction> get didPerformDTMFAction => _didPerformDTMFAction.stream;
-  static Stream<ProviderResetEvent> get providerReset => _providerReset.stream;
-  static Stream<CheckReachabilityEvent> get checkReachability => _checkReachability.stream;
+  /// Accepted an incoming call
+  Stream<CallKeepBaseData> get onCallAccepted => _callAcceptController.stream.asBroadcastStream();
 
-  static Future<void> _emit(MethodCall call) async {
-    print('[CallKeep] INFO: received event "${call.method}" ${call.arguments}');
+  /// Declined an incoming call
+  Stream<CallKeepBaseData> get onCallDeclined => _callDeclineController.stream.asBroadcastStream();
 
-    switch (call.method) {
-      case "didReceiveStartCallAction":
-        _didReceiveStartCallAction.add(StartCallAction._new(call.arguments));
-        break;
-      case "performAnswerCallAction":
-        _performAnswerCallAction.add(AnswerCallAction._new(call.arguments));
-        break;
-      case "performEndCallAction":
-        _performEndCallAction.add(EndCallAction._new(call.arguments));
-        break;
-      case "didActivateAudioSession":
-        _didActivateAudioSession.add(DidActivateAudioSessionEvent());
-        break;
-      case "didDeactivateAudioSession":
-        _didDeactivateAudioSession.add(DidDeactivateAudioSessionEvent());
-        break;
-      case "didDisplayIncomingCall":
-        _didDisplayIncomingCall.add(DidDisplayIncomingCallEvent._new(call.arguments));
-        break;
-      case "didPerformSetMutedCallAction":
-        _didPerformSetMutedCallAction.add(DidPerformSetMutedCallAction._new(call.arguments));
-        break;
-      case "didToggleHoldAction":
-        _didToggleHoldAction.add(DidToggleHoldAction._new(call.arguments));
-        break;
-      case "didPerformDTMFAction":
-        _didPerformDTMFAction.add(DidPerformDTMFAction._new(call.arguments));
-        break;
-      case "providerReset":
-        _providerReset.add(ProviderResetEvent());
-        break;
-      case "checkReachability":
-        _checkReachability.add(CheckReachabilityEvent());
-        break;
-      default:
-        print('[CallKeep] WARN: received unknown event "${call.method}"');
+  /// Ended an incoming/outgoing call
+  Stream<CallKeepBaseData> get onCallEnded => _callEndedController.stream.asBroadcastStream();
+
+  /// Missed an incoming call due to timeout
+  Stream<CallKeepBaseData> get onCallTimedOut => _callTimeOutController.stream.asBroadcastStream();
+
+  /// Calling back after a missed call notification - Android only
+  Stream<CallKeepBaseData> get onCallBack => _callBackController.stream.asBroadcastStream();
+
+  /// CallKit hold was toggled - iOS only
+  Stream<HoldToggleData> get onHoldToggled => _holdToggleController.stream.asBroadcastStream();
+
+  /// CallKit Mute was toggled - iOS only
+  Stream<MuteToggleData> get onMuteToggled => _muteToggleController.stream.asBroadcastStream();
+
+  /// DMTF (Dual Tone Multi Frequency) was toggled - iOS only
+  Stream<DmtfToggleData> get onDmtfToggled => _dmtfToggleController.stream.asBroadcastStream();
+
+  /// Call group was toggled - iOS only
+  Stream<CallGroupToggleData> get onCallGroupToggled =>
+      _callGroupToggleController.stream.asBroadcastStream();
+
+  /// AVAudioSession was toggled (activated/deactivated) - iOS only
+  Stream<bool> get onAudioSessionToggled =>
+      _audioSessionToggleController.stream.asBroadcastStream();
+
+  /// PushKit token was updated for VoIP - iOS only
+  Stream<String> get onPushTokenUpdated => _pushTokenUpdateController.stream.asBroadcastStream();
+
+  /// Show Incoming call UI.
+  /// On iOS, using Callkit. On Android, using a custom UI.
+  Future<void> displayIncomingCall(CallKeepIncomingConfig config) async {
+    await _channel.invokeMethod("displayIncomingCall", config.toMap());
+  }
+
+  /// Show Miss Call Notification.
+  /// Only Android
+  Future<void> showMissCallNotification(CallKeepIncomingConfig config) async {
+    await _channel.invokeMethod("showMissCallNotification", config.toMap());
+  }
+
+  /// Start an Outgoing call.
+  /// On iOS, using Callkit(create a history into the Phone app).
+  /// On Android, Nothing(only callback event listener).
+  Future<void> startCall(CallKeepOutgoingConfig config) async {
+    await _channel.invokeMethod("startCall", config.toMap());
+  }
+
+  /// End an Incoming/Outgoing call.
+  /// On iOS, using Callkit(update a history into the Phone app).
+  /// On Android, Nothing(only callback event listener).
+  Future<void> endCall(String uuid) async {
+    await _channel.invokeMethod("endCall", {'id': uuid});
+  }
+
+  /// End all calls.
+  Future<void> endAllCalls() async {
+    await _channel.invokeMethod("endAllCalls");
+  }
+
+  /// Get active calls.
+  /// On iOS: return active calls from Callkit.
+  /// On Android: only return last call
+  Future<List<CallKeepBaseData>> activeCalls() async {
+    final activeCallsRaw = await _channel.invokeMethod<List>("activeCalls");
+    if (activeCallsRaw == null) return [];
+    return activeCallsRaw
+        .cast<Map<String, dynamic>>()
+        .map((e) => CallKeepBaseData.fromMap(e))
+        .toList();
+  }
+
+  /// Get device push token VoIP.
+  /// On iOS: return deviceToken for VoIP.
+  /// On Android: return Empty
+  Future<String> getDevicePushTokenVoIP() async {
+    return (await _channel.invokeMethod<String>("getDevicePushTokenVoIP")) ?? '';
+  }
+
+  void _handleCallKeepEvent(dynamic data) {
+    if (data is Map) {
+      final event = callKeepEventTypeFromName('event');
+      final body = data['body'] as Map<String, dynamic>;
+      switch (event) {
+        case CallKeepEventType.devicePushTokenUpdated:
+          if (body['deviceTokenVoIP'] == null) return;
+          _pushTokenUpdateController.add(body['deviceTokenVoIP'] as String);
+          break;
+        case CallKeepEventType.callIncoming:
+          _incomingCallController.add(CallKeepBaseData.fromMap(body));
+          break;
+        case CallKeepEventType.callStart:
+          _callStartController.add(CallKeepBaseData.fromMap(body));
+          break;
+        case CallKeepEventType.callAccept:
+          _callAcceptController.add(CallKeepBaseData.fromMap(body));
+          break;
+        case CallKeepEventType.callDecline:
+          _callDeclineController.add(CallKeepBaseData.fromMap(body));
+          break;
+        case CallKeepEventType.callEnded:
+          _callEndedController.add(CallKeepBaseData.fromMap(body));
+          break;
+        case CallKeepEventType.callTimedOut:
+          _callTimeOutController.add(CallKeepBaseData.fromMap(body));
+          break;
+        case CallKeepEventType.missedCallback:
+          break;
+        case CallKeepEventType.holdToggled:
+          final holdToggleData = HoldToggleData.fromMap(body);
+          _holdToggleController.add(holdToggleData);
+          break;
+        case CallKeepEventType.muteToggled:
+          final muteToggleData = MuteToggleData.fromMap(body);
+          _muteToggleController.add(muteToggleData);
+          break;
+        case CallKeepEventType.dmtfToggled:
+          final dmtfToggleData = DmtfToggleData.fromMap(body);
+          _dmtfToggleController.add(dmtfToggleData);
+          break;
+        case CallKeepEventType.callGroupToggled:
+          final callGroupToggleData = CallGroupToggleData.fromMap(body);
+          _callGroupToggleController.add(callGroupToggleData);
+          break;
+        case CallKeepEventType.audioSessionToggled:
+          _audioSessionToggleController.add(body['isActivate']);
+          break;
+      }
     }
   }
 
-  static Future<void> setup({String? imageName}) async {
-    _channel.setMethodCallHandler(CallKeep._emit);
-
-    await _channel.invokeMethod('setup', {
-      'imageName': imageName,
-    });
-  }
-
-  static Future<void> askForPermissionsIfNeeded(
-    BuildContext context, {
-    List<String>? additionalPermissionsPermissions,
-    String? alertTitle,
-    String? alertDescription,
-    String? cancelButton,
-    String? okButton,
-  }) async {
-    if (!Platform.isAndroid) return;
-
-    final showAccountAlert =
-        await _hasPhoneAccountPermission(additionalPermissionsPermissions ?? []);
-    if (showAccountAlert != true) return;
-
-    final shouldOpenAccounts = await _showPermissionDialog(context,
-        alertTitle: alertTitle,
-        alertDescription: alertDescription,
-        cancelButton: cancelButton,
-        okButton: okButton);
-    if (shouldOpenAccounts != true) return;
-
-    await _openPhoneAccounts();
-  }
-
-  // /// Checks if the user has set a default [phone account](https://developer.android.com/reference/android/telecom/PhoneAccount).
-  // ///
-  // /// If the user has not set a default they will be prompted to do so with an alert.
-  // ///
-  // /// This is a workaround for an [issue](https://github.com/wazo-pbx/react-native-callkeep/issues/33) affecting some Samsung devices.
-  // static Future<bool> hasDefaultPhoneAccount(BuildContext context, {String alertTitle, String alertDescription, String cancelButton, String okButton}) async {
-  //   if (!Platform.isAndroid) return true;
-
-  //   final hasDefault = await _channel.invokeMethod<bool>('checkDefaultPhoneAccount');
-  //   if (!hasDefault) return true;
-
-  //   final shouldOpenAccounts = await _showPermissionDialog(context, alertTitle: alertTitle, alertDescription: alertDescription, cancelButton: cancelButton, okButton: okButton);
-  //   if (!shouldOpenAccounts) return false;
-
-  //   await openPhoneAccounts();
-  //   return true;
-  // }
-
-  static Future<bool?> _hasPhoneAccountPermission([List<String>? optionalPermissions]) async {
-    if (!Platform.isAndroid) return true;
-
-    return await _channel.invokeMethod<bool>('checkPhoneAccountPermission', {
-      'optionalPermissions': optionalPermissions ?? [],
-    });
-  }
-
-  static Future<void> _openPhoneAccounts() async {
-    if (!Platform.isAndroid) return;
-
-    await _channel.invokeMethod('openPhoneAccounts', {});
-  }
-
-  /// _This function only runs on Android._
-  ///
-  /// Mark the current call as active (eg: when the callee has answered). Necessary to set the correct Android capabilities (hold, mute) once the call is set as active. Be sure to set this only after your call is ready for two way audio; used both incoming and outgoing calls.
-  static Future<void> setCurrentCallActive(String uuid) async {
-    await _channel.invokeMethod('setCurrentCallActive', {'uuid': uuid});
-  }
-
-  /// Display system UI for incoming calls
-  static Future<void> displayIncomingCall(String uuid,
-      [String? number, String? callerName, HandleType? handleType, bool? hasVideo]) async {
-    await _channel.invokeMethod('displayIncomingCall', {
-      'uuid': uuid,
-      'number': number,
-      'callerName': callerName,
-      'handleType': describeEnum(handleType.toString()),
-      'hasVideo': hasVideo,
-    });
-  }
-
-  /// _This function only runs on Android._
-  ///
-  /// Use this to tell the sdk a user answered a call from the app UI.
-  static Future<void> answerIncomingCall(String uuid) async {
-    if (!Platform.isAndroid) return;
-
-    await _channel.invokeMethod('answerIncomingCall', {'uuid': uuid});
-  }
-
-  /// When you make an outgoing call, tell the device that a call is occurring.
-  static Future<void> startCall(String uuid,
-      [String? number, String? callerName, HandleType? handleType, bool? hasVideo]) async {
-    await _channel.invokeMethod('startCall', {
-      'uuid': uuid,
-      'number': number,
-      'callerName': callerName,
-      'handleType': describeEnum(handleType.toString()),
-      'hasVideo': hasVideo,
-    });
-  }
-
-  /// When you finish an incoming/outgoing call.
-  static Future<void> endCall(String uuid) async {
-    await _channel.invokeMethod('endCall', {'uuid': uuid});
-  }
-
-  /// When you reject an incoming call.
-  static Future<void> rejectCall(String uuid) async {
-    await _channel.invokeMethod('rejectCall', {'uuid': uuid});
-  }
-
-  /// Switch the mic on/off.
-  static Future<void> setMutedCall(String uuid, bool muted) async {
-    await _channel.invokeMethod('setMutedCall', {'uuid': uuid, 'muted': muted});
-  }
-
-  /// Set a call on/off hold.
-  static Future<void> setOnHold(String uuid, bool hold) async {
-    await _channel.invokeMethod('setOnHold', {'uuid': uuid, 'hold': hold});
-  }
-
-  static Future<void> backToForeground() async {
-    await _channel.invokeMethod('backToForeground');
-  }
-
-  static Future<void> displayCustomIncomingCall(
-    String packageName,
-    String className, {
-    required String icon,
-    Map<String, dynamic>? extra,
-    String? contentTitle,
-    String? answerText,
-    String? declineText,
-    String? ringtoneUri,
-  }) async {
-    await _channel.invokeMethod('displayCustomIncomingCall', {
-      'packageName': packageName,
-      'className': className,
-      'icon': icon,
-      'extra': extra ?? Map(),
-      'contentTitle': contentTitle ?? 'Incoming call',
-      'answerText': answerText ?? 'Answer',
-      'declineText': declineText ?? 'Decline',
-      'ringtoneUri': ringtoneUri,
-    });
-  }
-
-  static Future<void> dismissCustomIncomingCall() async {
-    await _channel.invokeMethod('dismissCustomIncomingCall');
+  void close() {
+    _incomingCallController.close();
+    _callStartController.close();
+    _callAcceptController.close();
+    _callDeclineController.close();
+    _callEndedController.close();
+    _callTimeOutController.close();
+    _callBackController.close();
+    _holdToggleController.close();
+    _muteToggleController.close();
+    _dmtfToggleController.close();
+    _callGroupToggleController.close();
+    _audioSessionToggleController.close();
+    _pushTokenUpdateController.close();
   }
 }

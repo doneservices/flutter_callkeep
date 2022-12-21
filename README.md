@@ -1,6 +1,6 @@
 # callkeep
 
-iOS CallKit and Android ConnectionService bindings for Flutter
+Showing incoming call notification/screen using iOS CallKit and Android Custom UI for Flutter
 
 ## Getting Started
 
