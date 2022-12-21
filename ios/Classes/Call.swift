@@ -149,13 +149,13 @@ public class Call: NSObject {
     @objc public init(id: String, callerName: String, handle: String, hasVideo: Bool) {
         self.uuid = id
         self.callerName = callerName
-        self.appName = "Callkit"
+        self.appName = "CallKeep"
         self.handle = handle
         self.avatar = ""
         self.hasVideo = hasVideo
         self.duration = 30000
         self.extra = [:]
-        self.iconName = "CallKitLogo"
+        self.iconName = "CallKeepLogo"
         self.handleType = ""
         self.supportsVideo = true
         self.maximumCallGroups = 2
@@ -183,7 +183,7 @@ public class Call: NSObject {
     public init(args: [String: Any?]) {
         self.uuid = args["id"] as? String ?? ""
         self.callerName = args["callerName"] as? String ?? ""
-        self.appName = args["appName"] as? String ?? "Callkit"
+        self.appName = args["appName"] as? String ?? "CallKeep"
         self.handle = args["handle"] as? String ?? ""
         self.avatar = args["avatar"] as? String ?? ""
         self.hasVideo = args["hasVideo"] as? Bool ?? false
@@ -192,7 +192,7 @@ public class Call: NSObject {
         
         
         if let ios = args["ios"] as? [String: Any] {
-            self.iconName = ios["iconName"] as? String ?? "CallKitLogo"
+            self.iconName = ios["iconName"] as? String ?? "CallKeepLogo"
             self.handleType = ios["handleType"] as? String ?? ""
             self.supportsVideo = ios["supportsVideo"] as? Bool ?? true
             self.maximumCallGroups = ios["maximumCallGroups"] as? Int ?? 2
@@ -208,7 +208,7 @@ public class Call: NSObject {
             self.audioSessionPreferredSampleRate = ios["audioSessionPreferredSampleRate"] as? Double ?? 44100.0
             self.audioSessionPreferredIOBufferDuration = ios["audioSessionPreferredIOBufferDuration"] as? Double ?? 0.005
         }else {
-            self.iconName = args["iconName"] as? String ?? "CallKitLogo"
+            self.iconName = args["iconName"] as? String ?? "CallKeepLogo"
             self.handleType = args["handleType"] as? String ?? ""
             self.supportsVideo = args["supportsVideo"] as? Bool ?? true
             self.maximumCallGroups = args["maximumCallGroups"] as? Int ?? 2

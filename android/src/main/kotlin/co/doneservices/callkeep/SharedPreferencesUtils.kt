@@ -5,12 +5,12 @@ import android.content.SharedPreferences
 import com.google.gson.reflect.TypeToken
 
 
-private const val CALLKIT_PREFERENCES_FILE_NAME = "flutter_callkit_incoming"
+private const val CALLKEEP_PREFERENCES_FILE_NAME = "flutter_callkeep"
 private var prefs: SharedPreferences? = null
 private var editor: SharedPreferences.Editor? = null
 
 private fun initInstance(context: Context) {
-    prefs = context.getSharedPreferences(CALLKIT_PREFERENCES_FILE_NAME, Context.MODE_PRIVATE)
+    prefs = context.getSharedPreferences(CALLKEEP_PREFERENCES_FILE_NAME, Context.MODE_PRIVATE)
     editor = prefs?.edit()
 }
 

@@ -8,8 +8,8 @@
 #import "flutter_callkeep-Swift.h"
 #endif
 
-@implementation FlutterCallkitIncomingPlugin
+@implementation CallKeepPlugin
 + (void)registerWithRegistrar:(NSObject<FlutterPluginRegistrar>*)registrar {
-  [SwiftFlutterCallkitIncomingPlugin registerWithRegistrar:registrar];
+  [SwiftCallKeepPlugin registerWithRegistrar:registrar];
 }
 @end

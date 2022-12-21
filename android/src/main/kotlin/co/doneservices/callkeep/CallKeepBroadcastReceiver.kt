@@ -41,10 +41,11 @@ class CallKeepBroadcastReceiver : BroadcastReceiver() {
         const val EXTRA_CALLKEEP_TEXT_CALLBACK = "EXTRA_CALLKEEP_TEXT_CALLBACK"
         const val EXTRA_CALLKEEP_EXTRA = "EXTRA_CALLKEEP_EXTRA"
         const val EXTRA_CALLKEEP_HEADERS = "EXTRA_CALLKEEP_HEADERS"
-        const val EXTRA_CALLKEEP_IS_CUSTOM_NOTIFICATION = "EXTRA_CALLKEEP_IS_CUSTOM_NOTIFICATION"
-        const val EXTRA_CALLKEEP_IS_SHOW_LOGO = "EXTRA_CALLKEEP_IS_SHOW_LOGO"
-        const val EXTRA_CALLKEEP_IS_SHOW_MISSED_CALL_NOTIFICATION = "EXTRA_CALLKEEP_IS_SHOW_MISSED_CALL_NOTIFICATION"
-        const val EXTRA_CALLKEEP_IS_SHOW_CALLBACK = "EXTRA_CALLKEEP_IS_SHOW_CALLBACK"
+        const val EXTRA_CALLKEEP_SHOW_CUSTOM_NOTIFICATION = "EXTRA_CALLKEEP_SHOW_CUSTOM_NOTIFICATION"
+        const val EXTRA_CALLKEEP_IS_CUSTOM_NOTIFICATION_SMALL = "EXTRA_CALLKEEP_IS_CUSTOM_NOTIFICATION_SMALL"
+        const val EXTRA_CALLKEEP_SHOW_LOGO = "EXTRA_CALLKEEP_SHOW_LOGO"
+        const val EXTRA_CALLKEEP_SHOW_MISSED_CALL_NOTIFICATION = "EXTRA_CALLKEEP_SHOW_MISSED_CALL_NOTIFICATION"
+        const val EXTRA_CALLKEEP_SHOW_CALLBACK = "EXTRA_CALLKEEP_SHOW_CALLBACK"
         const val EXTRA_CALLKEEP_RINGTONE_FILE_NAME = "EXTRA_CALLKEEP_RINGTONE_FILE_NAME"
         const val EXTRA_CALLKEEP_BACKGROUND_COLOR = "EXTRA_CALLKEEP_BACKGROUND_COLOR"
         const val EXTRA_CALLKEEP_BACKGROUND_URL = "EXTRA_CALLKEEP_BACKGROUND_URL"
@@ -100,17 +101,17 @@ class CallKeepBroadcastReceiver : BroadcastReceiver() {
 
     @SuppressLint("MissingPermission")
     override fun onReceive(context: Context, intent: Intent) {
-        val callkitNotificationManager = CallkitNotificationManager(context)
+        val callKeepNotificationManager = CallKeepNotificationManager(context)
         val action = intent.action ?: return
         val data = intent.extras?.getBundle(EXTRA_CALLKEEP_INCOMING_DATA) ?: return
         when (action) {
             ACTION_CALL_INCOMING -> {
                 try {
-                    callkitNotificationManager.showIncomingNotification(data)
+                    callKeepNotificationManager.showIncomingNotification(data)
                     sendEventFlutter(ACTION_CALL_INCOMING, data)
                     addCall(context, Data.fromBundle(data))
 
-                    if (callkitNotificationManager.incomingChannelEnabled()) {
+                    if (callKeepNotificationManager.incomingChannelEnabled()) {
                         val soundPlayerServiceIntent =
                             Intent(context, CallKeepSoundPlayerService::class.java)
                         soundPlayerServiceIntent.putExtras(data)
@@ -132,7 +133,7 @@ class CallKeepBroadcastReceiver : BroadcastReceiver() {
                 try {
                     sendEventFlutter(ACTION_CALL_ACCEPT, data)
                     context.stopService(Intent(context, CallKeepSoundPlayerService::class.java))
-                    callkitNotificationManager.clearIncomingNotification(data)
+                    callKeepNotificationManager.clearIncomingNotification(data)
                     addCall(context, Data.fromBundle(data), true)
                 } catch (error: Exception) {
                     error.printStackTrace()
@@ -142,7 +143,7 @@ class CallKeepBroadcastReceiver : BroadcastReceiver() {
                 try {
                     sendEventFlutter(ACTION_CALL_DECLINE, data)
                     context.stopService(Intent(context, CallKeepSoundPlayerService::class.java))
-                    callkitNotificationManager.clearIncomingNotification(data)
+                    callKeepNotificationManager.clearIncomingNotification(data)
                     removeCall(context, Data.fromBundle(data))
                 } catch (error: Exception) {
                     error.printStackTrace()
@@ -152,7 +153,7 @@ class CallKeepBroadcastReceiver : BroadcastReceiver() {
                 try {
                     sendEventFlutter(ACTION_CALL_ENDED, data)
                     context.stopService(Intent(context, CallKeepSoundPlayerService::class.java))
-                    callkitNotificationManager.clearIncomingNotification(data)
+                    callKeepNotificationManager.clearIncomingNotification(data)
                     removeCall(context, Data.fromBundle(data))
                 } catch (error: Exception) {
                     error.printStackTrace()
@@ -162,8 +163,8 @@ class CallKeepBroadcastReceiver : BroadcastReceiver() {
                 try {
                     sendEventFlutter(ACTION_CALL_TIMEOUT, data)
                     context.stopService(Intent(context, CallKeepSoundPlayerService::class.java))
-                    if (data.getBoolean(EXTRA_CALLKEEP_IS_SHOW_MISSED_CALL_NOTIFICATION, true)) {
-                        callkitNotificationManager.showMissCallNotification(data)
+                    if (data.getBoolean(EXTRA_CALLKEEP_SHOW_MISSED_CALL_NOTIFICATION, true)) {
+                        callKeepNotificationManager.showMissCallNotification(data)
                     }
                     removeCall(context, Data.fromBundle(data))
                 } catch (error: Exception) {
@@ -172,7 +173,7 @@ class CallKeepBroadcastReceiver : BroadcastReceiver() {
             }
             ACTION_CALL_CALLBACK -> {
                 try {
-                    callkitNotificationManager.clearMissCallNotification(data)
+                    callKeepNotificationManager.clearMissCallNotification(data)
                     sendEventFlutter(ACTION_CALL_CALLBACK, data)
                     if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
                         val closeNotificationPanel = Intent(Intent.ACTION_CLOSE_SYSTEM_DIALOGS)
@@ -188,7 +189,8 @@ class CallKeepBroadcastReceiver : BroadcastReceiver() {
     @Suppress("UNCHECKED_CAST")
     private fun sendEventFlutter(event: String, data: Bundle) {
         val android = mapOf(
-                "showCustomNotification" to data.getBoolean(EXTRA_CALLKEEP_IS_CUSTOM_NOTIFICATION, false),
+                "showCustomNotification" to data.getBoolean(EXTRA_CALLKEEP_SHOW_CUSTOM_NOTIFICATION, false),
+                "isCustomNotificationSmall" to data.getBoolean(EXTRA_CALLKEEP_IS_CUSTOM_NOTIFICATION_SMALL, false),
                 "ringtoneFileName" to data.getString(EXTRA_CALLKEEP_RINGTONE_FILE_NAME, ""),
                 "backgroundColor" to data.getString(EXTRA_CALLKEEP_BACKGROUND_COLOR, ""),
                 "backgroundUrl" to data.getString(EXTRA_CALLKEEP_BACKGROUND_URL, ""),
@@ -210,6 +212,6 @@ class CallKeepBroadcastReceiver : BroadcastReceiver() {
                 "extra" to data.getSerializable(EXTRA_CALLKEEP_EXTRA) as HashMap<String, Any?>,
                 "android" to android
         )
-        FlutterCallkitIncomingPlugin.sendEvent(event, forwardData)
+        CallKeepPlugin.sendEvent(event, forwardData)
     }
 }

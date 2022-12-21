@@ -26,7 +26,8 @@ import co.doneservices.callkeep.CallKeepBroadcastReceiver.Companion.EXTRA_CALLKE
 import co.doneservices.callkeep.CallKeepBroadcastReceiver.Companion.EXTRA_CALLKEEP_HANDLE
 import co.doneservices.callkeep.CallKeepBroadcastReceiver.Companion.EXTRA_CALLKEEP_ID
 import co.doneservices.callkeep.CallKeepBroadcastReceiver.Companion.EXTRA_CALLKEEP_INCOMING_CALL_NOTIFICATION_CHANNEL_NAME
-import co.doneservices.callkeep.CallKeepBroadcastReceiver.Companion.EXTRA_CALLKEEP_IS_CUSTOM_NOTIFICATION
+import co.doneservices.callkeep.CallKeepBroadcastReceiver.Companion.EXTRA_CALLKEEP_SHOW_CUSTOM_NOTIFICATION
+import co.doneservices.callkeep.CallKeepBroadcastReceiver.Companion.EXTRA_CALLKEEP_IS_CUSTOM_NOTIFICATION_SMALL
 import co.doneservices.callkeep.CallKeepBroadcastReceiver.Companion.EXTRA_CALLKEEP_MISSED_CALL_NOTIFICATION_CHANNEL_NAME
 import co.doneservices.callkeep.CallKeepBroadcastReceiver.Companion.EXTRA_CALLKEEP_CALLER_NAME
 import co.doneservices.callkeep.CallKeepBroadcastReceiver.Companion.EXTRA_CALLKEEP_TEXT_ACCEPT
@@ -41,14 +42,14 @@ import com.squareup.picasso.Target
 import okhttp3.OkHttpClient
 
 
-class CallkitNotificationManager(private val context: Context) {
+class CallKeepNotificationManager(private val context: Context) {
 
     companion object {
 
         const val EXTRA_TIME_START_CALL = "EXTRA_TIME_START_CALL"
 
-        private const val NOTIFICATION_CHANNEL_ID_INCOMING = "callkit_incoming_channel_id"
-        private const val NOTIFICATION_CHANNEL_ID_MISSED = "callkit_missed_channel_id"
+        private const val NOTIFICATION_CHANNEL_ID_INCOMING = "callkeep_channel_id"
+        private const val NOTIFICATION_CHANNEL_ID_MISSED = "callkeep_missed_channel_id"
     }
 
     private lateinit var notificationBuilder: NotificationCompat.Builder
@@ -89,7 +90,7 @@ class CallkitNotificationManager(private val context: Context) {
     fun showIncomingNotification(data: Bundle) {
         data.putLong(EXTRA_TIME_START_CALL, System.currentTimeMillis())
 
-        notificationId = data.getString(EXTRA_CALLKEEP_ID, "callkit_incoming").hashCode()
+        notificationId = data.getString(EXTRA_CALLKEEP_ID, "callkeep").hashCode()
         createNotificationChanel(
             data.getString(EXTRA_CALLKEEP_INCOMING_CALL_NOTIFICATION_CHANNEL_NAME, "Incoming Call"),
             data.getString(EXTRA_CALLKEEP_MISSED_CALL_NOTIFICATION_CHANNEL_NAME, "Missed Call"),
@@ -131,14 +132,15 @@ class CallkitNotificationManager(private val context: Context) {
         }
         notificationBuilder.setChannelId(NOTIFICATION_CHANNEL_ID_INCOMING)
         notificationBuilder.priority = NotificationCompat.PRIORITY_MAX
-        val showCustomNotification = data.getBoolean(EXTRA_CALLKEEP_IS_CUSTOM_NOTIFICATION, false)
+        val showCustomNotification = data.getBoolean(EXTRA_CALLKEEP_SHOW_CUSTOM_NOTIFICATION, false)
+        val isCustomNotificationSmall = data.getBoolean(EXTRA_CALLKEEP_IS_CUSTOM_NOTIFICATION_SMALL, false)
         if (showCustomNotification) {
             notificationViews =
                     RemoteViews(context.packageName, R.layout.layout_custom_notification)
             initNotificationViews(notificationViews!!, data)
 
 
-            if (Build.MANUFACTURER.equals("Samsung", ignoreCase = true) && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            if ((Build.MANUFACTURER.equals("Samsung", ignoreCase = true) && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) || isCustomNotificationSmall) {
                 notificationSmallViews =
                         RemoteViews(context.packageName, R.layout.layout_custom_small_ex_notification)
                 initNotificationViews(notificationSmallViews!!, data)
@@ -220,7 +222,7 @@ class CallkitNotificationManager(private val context: Context) {
     }
 
     fun showMissCallNotification(data: Bundle) {
-        notificationId = data.getString(EXTRA_CALLKEEP_ID, "callkit_incoming").hashCode() + 1
+        notificationId = data.getString(EXTRA_CALLKEEP_ID, "callkeep").hashCode() + 1
         createNotificationChanel(
             data.getString(EXTRA_CALLKEEP_INCOMING_CALL_NOTIFICATION_CHANNEL_NAME, "Incoming Call"),
             data.getString(EXTRA_CALLKEEP_MISSED_CALL_NOTIFICATION_CHANNEL_NAME, "Missed Call"),
@@ -245,7 +247,7 @@ class CallkitNotificationManager(private val context: Context) {
         val missedCallText = data.getString(EXTRA_CALLKEEP_TEXT_MISSED_CALL, "")
         notificationBuilder.setSubText(if (TextUtils.isEmpty(missedCallText)) context.getString(R.string.text_missed_call) else missedCallText)
         notificationBuilder.setSmallIcon(smallIcon)
-        val showCustomNotification = data.getBoolean(EXTRA_CALLKEEP_IS_CUSTOM_NOTIFICATION, false)
+        val showCustomNotification = data.getBoolean(EXTRA_CALLKEEP_SHOW_CUSTOM_NOTIFICATION, false)
         if (showCustomNotification) {
             notificationViews =
                     RemoteViews(context.packageName, R.layout.layout_custom_miss_notification)
@@ -261,7 +263,7 @@ class CallkitNotificationManager(private val context: Context) {
                     R.id.llCallback,
                     getCallbackPendingIntent(notificationId, data)
             )
-            val showCallBackAction = data.getBoolean(CallKeepBroadcastReceiver.EXTRA_CALLKEEP_IS_SHOW_CALLBACK, true)
+            val showCallBackAction = data.getBoolean(CallKeepBroadcastReceiver.EXTRA_CALLKEEP_SHOW_CALLBACK, true)
             notificationViews?.setViewVisibility(R.id.llCallback, if (showCallBackAction) View.VISIBLE else View.GONE)
             val callBackText = data.getString(EXTRA_CALLKEEP_TEXT_CALLBACK, "")
             notificationViews?.setTextViewText(R.id.tvCallback, if (TextUtils.isEmpty(callBackText)) context.getString(R.string.text_call_back) else callBackText)
@@ -288,7 +290,7 @@ class CallkitNotificationManager(private val context: Context) {
                 getPicassoInstance(context, headers).load(avatarUrl)
                         .into(targetLoadAvatarDefault)
             }
-            val showCallBackAction = data.getBoolean(CallKeepBroadcastReceiver.EXTRA_CALLKEEP_IS_SHOW_CALLBACK, true)
+            val showCallBackAction = data.getBoolean(CallKeepBroadcastReceiver.EXTRA_CALLKEEP_SHOW_CALLBACK, true)
             if (showCallBackAction) {
                 val callBackText = data.getString(EXTRA_CALLKEEP_TEXT_CALLBACK, "")
                 val callbackAction: NotificationCompat.Action = NotificationCompat.Action.Builder(
@@ -324,13 +326,13 @@ class CallkitNotificationManager(private val context: Context) {
 
 
     fun clearIncomingNotification(data: Bundle) {
-        context.sendBroadcast(CallkitIncomingActivity.getIntentEnded())
-        notificationId = data.getString(EXTRA_CALLKEEP_ID, "callkit_incoming").hashCode()
+        context.sendBroadcast(callkeepIncomingActivity.getIntentEnded())
+        notificationId = data.getString(EXTRA_CALLKEEP_ID, "callkeep").hashCode()
         getNotificationManager().cancel(notificationId)
     }
 
     fun clearMissCallNotification(data: Bundle) {
-        notificationId = data.getString(EXTRA_CALLKEEP_ID, "callkit_incoming").hashCode()
+        notificationId = data.getString(EXTRA_CALLKEEP_ID, "callkeep").hashCode()
         getNotificationManager().cancel(notificationId)
         Handler(Looper.getMainLooper()).postDelayed({
             try {
@@ -461,7 +463,7 @@ class CallkitNotificationManager(private val context: Context) {
     }
 
     private fun getActivityPendingIntent(id: Int, data: Bundle): PendingIntent {
-        val intent = CallkitIncomingActivity.getIntent(data)
+        val intent = callkeepIncomingActivity.getIntent(data)
         return PendingIntent.getActivity(context, id, intent, getFlagPendingIntent())
     }
 

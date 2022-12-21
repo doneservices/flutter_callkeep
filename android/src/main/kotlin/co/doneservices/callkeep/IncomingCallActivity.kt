@@ -31,7 +31,7 @@ import co.doneservices.callkeep.CallKeepBroadcastReceiver.Companion.EXTRA_CALLKE
 import co.doneservices.callkeep.CallKeepBroadcastReceiver.Companion.EXTRA_CALLKEEP_CALLER_NAME
 import co.doneservices.callkeep.CallKeepBroadcastReceiver.Companion.EXTRA_CALLKEEP_HANDLE
 import co.doneservices.callkeep.CallKeepBroadcastReceiver.Companion.EXTRA_CALLKEEP_HEADERS
-import co.doneservices.callkeep.CallKeepBroadcastReceiver.Companion.EXTRA_CALLKEEP_IS_SHOW_LOGO
+import co.doneservices.callkeep.CallKeepBroadcastReceiver.Companion.EXTRA_CALLKEEP_SHOW_LOGO
 import co.doneservices.callkeep.CallKeepBroadcastReceiver.Companion.EXTRA_CALLKEEP_HAS_VIDEO
 import co.doneservices.callkeep.widgets.RippleRelativeLayout
 import com.squareup.picasso.Picasso
@@ -122,7 +122,7 @@ class IncomingCallActivity : Activity() {
         val pm = applicationContext.getSystemService(POWER_SERVICE) as PowerManager
         val wakeLock = pm.newWakeLock(
                 PowerManager.SCREEN_BRIGHT_WAKE_LOCK or PowerManager.FULL_WAKE_LOCK or PowerManager.ACQUIRE_CAUSES_WAKEUP,
-                "Callkit:PowerManager"
+                "CallKeep:PowerManager"
         )
         wakeLock.acquire(duration)
     }
@@ -168,7 +168,7 @@ class IncomingCallActivity : Activity() {
         tvcallerName.text = data?.getString(EXTRA_CALLKEEP_CALLER_NAME, "")
         tvNumber.text = data?.getString(EXTRA_CALLKEEP_HANDLE, "")
 
-        val showLogo = data?.getBoolean(EXTRA_CALLKEEP_IS_SHOW_LOGO, false)
+        val showLogo = data?.getBoolean(EXTRA_CALLKEEP_SHOW_LOGO, false)
         ivLogo.visibility = if (showLogo == true) View.VISIBLE else View.INVISIBLE
 
         val avatarUrl = data?.getString(EXTRA_CALLKEEP_AVATAR, "")
@@ -218,7 +218,7 @@ class IncomingCallActivity : Activity() {
     private fun finishTimeout(data: Bundle?, duration: Long) {
         val currentSystemTime = System.currentTimeMillis()
         val timeStartCall =
-                data?.getLong(CallkitNotificationManager.EXTRA_TIME_START_CALL, currentSystemTime)
+                data?.getLong(CallKeepNotificationManager.EXTRA_TIME_START_CALL, currentSystemTime)
                         ?: currentSystemTime
 
         val timeOut = duration - abs(currentSystemTime - timeStartCall)

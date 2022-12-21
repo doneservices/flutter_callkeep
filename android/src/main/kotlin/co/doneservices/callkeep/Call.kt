@@ -27,6 +27,7 @@ data class Data(val args: Map<String, Any?>) {
     var from: String = ""
 
     var showCustomNotification: Boolean = false
+    var isCustomNotificationSmall: Boolean = false
     var showLogo: Boolean = false
     var showCallBackAction: Boolean = true
     var ringtoneFileName: String
@@ -43,6 +44,7 @@ data class Data(val args: Map<String, Any?>) {
         val android: HashMap<String, Any?>? = args["android"] as? HashMap<String, Any?>?
         if (android != null) {
             showCustomNotification = (android["showCustomNotification"] as? Boolean) ?: false
+            isCustomNotificationSmall = (android["isCustomNotificationSmall"] as? Boolean) ?: false
             showLogo = (android["showLogo"] as? Boolean) ?: false
             showCallBackAction = (android["showCallBackAction"] as? Boolean) ?: true
             ringtoneFileName = (android["ringtoneFileName"] as? String) ?: ""
@@ -54,6 +56,7 @@ data class Data(val args: Map<String, Any?>) {
             missedCallNotificationChannelName = android["missedCallNotificationChannelName"] as? String
         } else {
             showCustomNotification = (args["showCustomNotification"] as? Boolean) ?: false
+            isCustomNotificationSmall = (args["isCustomNotificationSmall"] as? Boolean) ?: false
             showLogo = (args["showLogo"] as? Boolean) ?: false
             showCallBackAction = (args["showCallBackAction"] as? Boolean) ?: true
             ringtoneFileName = (args["ringtoneFileName"] as? String) ?: ""
@@ -90,15 +93,19 @@ data class Data(val args: Map<String, Any?>) {
         bundle.putSerializable(CallKeepBroadcastReceiver.EXTRA_CALLKEEP_EXTRA, extra)
         bundle.putSerializable(CallKeepBroadcastReceiver.EXTRA_CALLKEEP_HEADERS, headers)
         bundle.putBoolean(
-                CallKeepBroadcastReceiver.EXTRA_CALLKEEP_IS_CUSTOM_NOTIFICATION,
+                CallKeepBroadcastReceiver.EXTRA_CALLKEEP_SHOW_CUSTOM_NOTIFICATION,
                 showCustomNotification
         )
         bundle.putBoolean(
-                CallKeepBroadcastReceiver.EXTRA_CALLKEEP_IS_SHOW_LOGO,
+                CallKeepBroadcastReceiver.EXTRA_CALLKEEP_IS_CUSTOM_NOTIFICATION_SMALL,
+                isCustomNotificationSmall
+        )
+        bundle.putBoolean(
+                CallKeepBroadcastReceiver.EXTRA_CALLKEEP_SHOW_LOGO,
                 showLogo
         )
         bundle.putBoolean(
-                CallKeepBroadcastReceiver.EXTRA_CALLKEEP_IS_SHOW_CALLBACK,
+                CallKeepBroadcastReceiver.EXTRA_CALLKEEP_SHOW_CALLBACK,
                 showCallBackAction
         )
         bundle.putString(CallKeepBroadcastReceiver.EXTRA_CALLKEEP_RINGTONE_FILE_NAME, ringtoneFileName)
@@ -113,7 +120,7 @@ data class Data(val args: Map<String, Any?>) {
         bundle.putString(CallKeepBroadcastReceiver.EXTRA_CALLKEEP_ACTION_COLOR, actionColor)
         bundle.putString(CallKeepBroadcastReceiver.EXTRA_CALLKEEP_ACTION_FROM, from)
         bundle.putBoolean(
-                CallKeepBroadcastReceiver.EXTRA_CALLKEEP_IS_SHOW_MISSED_CALL_NOTIFICATION,
+                CallKeepBroadcastReceiver.EXTRA_CALLKEEP_SHOW_MISSED_CALL_NOTIFICATION,
                 showMissedCallNotification
         )
         bundle.putString(
@@ -157,15 +164,19 @@ data class Data(val args: Map<String, Any?>) {
                     bundle.getSerializable(CallKeepBroadcastReceiver.EXTRA_CALLKEEP_HEADERS) as HashMap<String, Any?>
 
             data.showCustomNotification = bundle.getBoolean(
-                    CallKeepBroadcastReceiver.EXTRA_CALLKEEP_IS_CUSTOM_NOTIFICATION,
+                    CallKeepBroadcastReceiver.EXTRA_CALLKEEP_SHOW_CUSTOM_NOTIFICATION,
+                    false
+            )
+            data.showCustomNotification = bundle.getBoolean(
+                    CallKeepBroadcastReceiver.EXTRA_CALLKEEP_IS_CUSTOM_NOTIFICATION_SMALL,
                     false
             )
             data.showLogo = bundle.getBoolean(
-                    CallKeepBroadcastReceiver.EXTRA_CALLKEEP_IS_SHOW_LOGO,
+                    CallKeepBroadcastReceiver.EXTRA_CALLKEEP_SHOW_LOGO,
                     false
             )
             data.showCallBackAction = bundle.getBoolean(
-                    CallKeepBroadcastReceiver.EXTRA_CALLKEEP_IS_SHOW_CALLBACK,
+                    CallKeepBroadcastReceiver.EXTRA_CALLKEEP_SHOW_CALLBACK,
                     true
             )
             data.ringtoneFileName = bundle.getString(
@@ -185,7 +196,7 @@ data class Data(val args: Map<String, Any?>) {
             data.from =
                     bundle.getString(CallKeepBroadcastReceiver.EXTRA_CALLKEEP_ACTION_FROM, "")
             data.showMissedCallNotification = bundle.getBoolean(
-                    CallKeepBroadcastReceiver.EXTRA_CALLKEEP_IS_SHOW_MISSED_CALL_NOTIFICATION,
+                    CallKeepBroadcastReceiver.EXTRA_CALLKEEP_SHOW_MISSED_CALL_NOTIFICATION,
                     true
             )
             data.incomingCallNotificationChannelName = bundle.getString(
