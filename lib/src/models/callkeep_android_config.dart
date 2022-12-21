@@ -1,16 +1,4 @@
 class CallKeepAndroidConfig {
-  /// Text Accept to be shown for the user to accept the call
-  final String acceptText;
-
-  /// Text Decline to be shown for the user to decline the call
-  final String declineText;
-
-  /// Text Missed Call to be shown for the user to indicate a missed call
-  final String missedCallText;
-
-  /// Text Call Back to be shown for the user to call back after a missed call
-  final String callBackText;
-
   /// Using custom notifications.
   final bool showCustomNotification;
 
@@ -45,10 +33,6 @@ class CallKeepAndroidConfig {
   /// Notification channel name of missed call.
   final String missedCallNotificationChannelName;
   CallKeepAndroidConfig({
-    this.acceptText = 'Accept',
-    this.declineText = 'Decline',
-    this.missedCallText = 'Missed call',
-    this.callBackText = 'Call back',
     this.showCustomNotification = false,
     this.showLogo = false,
     this.showMissedCallNotification = true,
@@ -63,10 +47,6 @@ class CallKeepAndroidConfig {
 
   Map<String, dynamic> toMap() {
     return {
-      'acceptText': acceptText,
-      'declineText': declineText,
-      'missedCallText': missedCallText,
-      'callBackText': callBackText,
       'showCustomNotification': showCustomNotification,
       'showLogo': showLogo,
       'showMissedCallNotification': showMissedCallNotification,

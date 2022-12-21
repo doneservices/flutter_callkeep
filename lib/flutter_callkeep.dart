@@ -10,6 +10,8 @@ import 'package:flutter_callkeep/src/models/dmtf_toggle_data.dart';
 import 'package:flutter_callkeep/src/models/hold_toggle_data.dart';
 import 'package:flutter_callkeep/src/models/mute_toggle_data.dart';
 
+export 'package:flutter_callkeep/src/models/models.dart';
+
 /// Instance to use library functions.
 /// * displayIncomingCall(CallKeepIncomingConfig)
 /// * startCall(CallKeepOutgoingConfig)
@@ -24,9 +26,9 @@ class FlutterCallKeep {
     _eventChannel.receiveBroadcastStream().map(_handleCallKeepEvent);
   }
 
-  final FlutterCallKeep _instance = FlutterCallKeep._internal();
+  static final FlutterCallKeep _instance = FlutterCallKeep._internal();
 
-  FlutterCallKeep get instance => _instance;
+  static FlutterCallKeep get instance => _instance;
 
   final StreamController<CallKeepBaseData> _incomingCallController = StreamController();
   final StreamController<CallKeepBaseData> _callStartController = StreamController();

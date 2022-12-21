@@ -24,7 +24,7 @@ class CallKeepOutgoingConfig extends CallKeepBaseData {
 
   Map<String, dynamic> toMap() {
     return {
-      'uuid': uuid,
+      'id': uuid,
       'callerName': callerName,
       'handle': handle,
       'hasVideo': hasVideo,

@@ -1,7 +1,4 @@
 class CallKeepIosConfig {
-  /// App's name. using for display inside Callkit.
-  final String appName;
-
   /// App's Icon. used for being shown inside Callkit
   final String iconName;
 
@@ -45,7 +42,6 @@ class CallKeepIosConfig {
   /// It should be Copy Bundle Resources(Build Phases)
   final String ringtoneFileName;
   CallKeepIosConfig({
-    required this.appName,
     this.iconName = 'CallKitLogo',
     this.handleType = CallKitHandleType.generic,
     this.isVideoSupported = true,
@@ -64,7 +60,6 @@ class CallKeepIosConfig {
 
   Map<String, dynamic> toMap() {
     return {
-      'appName': appName,
       'iconName': iconName,
       'handleType': handleType.name,
       'isVideoSupported': isVideoSupported,

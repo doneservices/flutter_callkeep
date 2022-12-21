@@ -29,12 +29,28 @@ class CallKeepBaseData {
 
   factory CallKeepBaseData.fromMap(Map<String, dynamic> map) {
     return CallKeepBaseData(
-      uuid: map['uuid'] ?? '',
+      uuid: map['id'] ?? '',
       callerName: map['callerName'],
       handle: map['handle'],
       hasVideo: map['hasVideo'] ?? false,
       duration: map['duration']?.toDouble() ?? 180.0,
       extra: (map['extra'] as Map?)?.cast<String, dynamic>() ?? {},
     );
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'id': uuid,
+      'callerName': callerName,
+      'handle': handle,
+      'hasVideo': hasVideo,
+      'duration': duration,
+      'extra': extra ?? {},
+    };
+  }
+
+  @override
+  String toString() {
+    return 'CallKeepBaseData(uuid: $uuid, callerName: $callerName, handle: $handle, hasVideo: $hasVideo, duration: $duration, extra: $extra)';
   }
 }

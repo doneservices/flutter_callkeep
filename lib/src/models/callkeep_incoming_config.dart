@@ -3,6 +3,21 @@ import 'package:flutter_callkeep/src/models/callkeep_android_config.dart';
 import 'package:flutter_callkeep/src/models/callkeep_ios_config.dart';
 
 class CallKeepIncomingConfig extends CallKeepBaseData {
+  /// App's name. using for display inside Callkit.
+  final String appName;
+
+  /// Text Accept to be shown for the user to accept the call
+  final String acceptText;
+
+  /// Text Decline to be shown for the user to decline the call
+  final String declineText;
+
+  /// Text Missed Call to be shown for the user to indicate a missed call
+  final String missedCallText;
+
+  /// Text Call Back to be shown for the user to call back after a missed call
+  final String callBackText;
+
   /// Avatar's URL used for display for Android.
   /// i.e: /android/src/main/res/drawable-xxxhdpi/ic_default_avatar.png
   final String? avatar;
@@ -17,7 +32,12 @@ class CallKeepIncomingConfig extends CallKeepBaseData {
   final CallKeepIosConfig iosConfig;
 
   CallKeepIncomingConfig({
+    this.acceptText = 'Accept',
+    this.declineText = 'Decline',
+    this.missedCallText = 'Missed call',
+    this.callBackText = 'Call back',
     required String uuid,
+    required this.appName,
     String? callerName,
     this.avatar,
     String? handle,
@@ -38,8 +58,13 @@ class CallKeepIncomingConfig extends CallKeepBaseData {
 
   Map<String, dynamic> toMap() {
     return {
-      'uuid': uuid,
+      'id': uuid,
       'callerName': callerName,
+      'appName': appName,
+      'acceptText': acceptText,
+      'declineText': declineText,
+      'missedCallText': missedCallText,
+      'callBackText': callBackText,
       'avatar': avatar,
       'handle': handle,
       'hasVideo': hasVideo,
