@@ -1,3 +1,6 @@
+/// The configurations needed for Android
+///
+/// Holding files info and flags needed for CallKit setup
 class CallKeepIosConfig {
   /// App's Icon. used for being shown inside Callkit
   final String iconName;

@@ -1,3 +1,6 @@
+/// The configurations needed for Android
+///
+/// Holding colors, flags and channel names
 class CallKeepAndroidConfig {
   /// Using custom notifications.
   final bool showCustomNotification;

@@ -1,3 +1,8 @@
+/// Holds the base data for CallKeep
+///
+/// This is used as base for both [CallKeepIncomingConfig], [CallKeepOutgoingConfig]
+///
+/// But it's also the data returned from multiple events in the package
 class CallKeepBaseData {
   /// A unique UUID identifier for each call
   /// and when the call is ended, the same UUID for that call to be used.

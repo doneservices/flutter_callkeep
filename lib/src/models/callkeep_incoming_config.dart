@@ -1,5 +1,6 @@
 import 'package:flutter_callkeep/src/models/calkeep_base_data.dart';
 import 'package:flutter_callkeep/src/models/callkeep_android_config.dart';
+import 'package:flutter_callkeep/src/models/callkeep_base_config.dart';
 import 'package:flutter_callkeep/src/models/callkeep_ios_config.dart';
 
 class CallKeepIncomingConfig extends CallKeepBaseData {
@@ -30,6 +31,35 @@ class CallKeepIncomingConfig extends CallKeepBaseData {
 
   /// iOS configuration needed for CallKit.
   final CallKeepIosConfig iosConfig;
+
+  factory CallKeepIncomingConfig.fromBaseConfig({
+    required CallKeepBaseConfig config,
+    required String uuid,
+    String? callerName,
+    String? handle,
+    String? avatar,
+    bool hasVideo = false,
+    Map<String, dynamic>? extra,
+    double duration = 180,
+  }) {
+    return CallKeepIncomingConfig(
+      uuid: uuid,
+      callerName: callerName,
+      avatar: avatar,
+      appName: config.appName,
+      acceptText: config.acceptText,
+      declineText: config.declineText,
+      missedCallText: config.missedCallText,
+      callBackText: config.callBackText,
+      handle: handle,
+      hasVideo: hasVideo,
+      duration: duration,
+      extra: extra,
+      headers: config.headers,
+      androidConfig: config.androidConfig,
+      iosConfig: config.iosConfig,
+    );
+  }
 
   CallKeepIncomingConfig({
     this.acceptText = 'Accept',
