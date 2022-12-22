@@ -45,7 +45,7 @@ class CallKeepIosConfig {
   /// It should be Copy Bundle Resources(Build Phases)
   final String ringtoneFileName;
   CallKeepIosConfig({
-    this.iconName = 'CallKitLogo',
+    this.iconName = 'CallKeepLogo',
     this.handleType = CallKitHandleType.generic,
     this.isVideoSupported = true,
     this.maximumCallGroups = 2,
