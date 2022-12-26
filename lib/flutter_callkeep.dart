@@ -1,14 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/services.dart';
-import 'package:flutter_callkeep/src/models/calkeep_base_data.dart';
-import 'package:flutter_callkeep/src/models/call_group_toggle_data.dart';
-import 'package:flutter_callkeep/src/models/callkeep_event_type.dart';
-import 'package:flutter_callkeep/src/models/callkeep_incoming_config.dart';
-import 'package:flutter_callkeep/src/models/callkeep_outgoing_config.dart';
-import 'package:flutter_callkeep/src/models/dmtf_toggle_data.dart';
-import 'package:flutter_callkeep/src/models/hold_toggle_data.dart';
-import 'package:flutter_callkeep/src/models/mute_toggle_data.dart';
+import 'package:flutter_callkeep/flutter_callkeep.dart';
 
 export 'package:flutter_callkeep/src/models/models.dart';
 
@@ -19,71 +12,55 @@ export 'package:flutter_callkeep/src/models/models.dart';
 /// * endAllCalls()
 ///
 class CallKeep {
-  static const MethodChannel _channel = const MethodChannel('flutter_callkeep');
-  static const EventChannel _eventChannel = const EventChannel('flutter_callkeep_events');
+  final MethodChannel _channel = const MethodChannel('flutter_callkeep');
+  final EventChannel _eventChannel = const EventChannel('flutter_callkeep_events');
+  late final StreamSubscription _eventChannelSubscription;
 
-  CallKeep._internal() {
-    _eventChannel.receiveBroadcastStream().map(_handleCallKeepEvent);
-  }
+  /// Listen to a [CallKeepEvent]
+  ///
+  /// CallKeep.onEvent.listen((event) {
+  ///
+  /// // event type => data runtime type - description
+  ///
+  /// [CallKeepEventType.callIncoming] => [CallKeepCallEvent] - Received an incoming call
+  ///
+  /// [CallKeepEventType.callStart] => [CallKeepCallEvent] - Started an outgoing call
+  ///
+  /// [CallKeepEventType.callAccept] => [CallKeepCallEvent] - Accepted an incoming call
+  ///
+  /// [CallKeepEventType.callDecline] => [CallKeepCallEvent] - Declined an incoming call
+  ///
+  /// [CallKeepEventType.callEnded] => [CallKeepCallEvent] - Ended an incoming/outgoing call
+  ///
+  /// [CallKeepEventType.callTimedOut] => [CallKeepCallEvent] - Missed an incoming call
+  ///
+  /// [CallKeepEventType.missedCallback] => [CallKeepCallEvent] - calling back after a missed call
+  /// notification - Android only (click action `Call back` from missed call notification)
+  ///
+  /// [CallKeepEventType.holdToggled] => [CallKeepHoldEvent] - CallKit hold was toggled - iOS only
+  ///
+  /// [CallKeepEventType.muteToggled] => [CallKeepMuteEvent] - CallKit Mute was toggled - iOS only
+  ///
+  /// [CallKeepEventType.dmtfToggled] => [CallKeepDmtfEvent] - DMTF (Dual Tone Multi Frequency)
+  /// was toggled - iOS only
+  ///
+  /// [CallKeepEventType.callGroupToggled] => [CallKeepCallGroupEvent] - Call group was toggled
+  /// - iOS only
+  ///
+  /// [CallKeepEventType.audioSessionToggled] => [CallKeepAudioSessionEvent] - AVAudioSession
+  /// was toggled (activated/deactivated) - iOS only
+  ///
+  /// [CallKeepEventType.audioSessionToggled] => [CallKeepVoipTokenEvent]- PushKit token was updated
+  ///  for VoIP - iOS only
+  ///
+  /// }
+  Stream<CallKeepEvent?> get onEvent =>
+      _eventChannel.receiveBroadcastStream().map(_handleCallKeepEvent);
 
+  CallKeep._internal();
   static final CallKeep _instance = CallKeep._internal();
 
   static CallKeep get instance => _instance;
-
-  final StreamController<CallKeepBaseData> _incomingCallController = StreamController();
-  final StreamController<CallKeepBaseData> _callStartController = StreamController();
-  final StreamController<CallKeepBaseData> _callAcceptController = StreamController();
-  final StreamController<CallKeepBaseData> _callDeclineController = StreamController();
-  final StreamController<CallKeepBaseData> _callEndedController = StreamController();
-  final StreamController<CallKeepBaseData> _callTimeOutController = StreamController();
-  final StreamController<CallKeepBaseData> _callBackController = StreamController();
-  final StreamController<HoldToggleData> _holdToggleController = StreamController();
-  final StreamController<MuteToggleData> _muteToggleController = StreamController();
-  final StreamController<DmtfToggleData> _dmtfToggleController = StreamController();
-  final StreamController<CallGroupToggleData> _callGroupToggleController = StreamController();
-  final StreamController<bool> _audioSessionToggleController = StreamController();
-  final StreamController<String> _pushTokenUpdateController = StreamController();
-
-  /// Received an incoming call
-  Stream<CallKeepBaseData> get onIncomingCall => _incomingCallController.stream.asBroadcastStream();
-
-  /// Started an outgoing call
-  Stream<CallKeepBaseData> get onCallStarted => _callStartController.stream.asBroadcastStream();
-
-  /// Accepted an incoming call
-  Stream<CallKeepBaseData> get onCallAccepted => _callAcceptController.stream.asBroadcastStream();
-
-  /// Declined an incoming call
-  Stream<CallKeepBaseData> get onCallDeclined => _callDeclineController.stream.asBroadcastStream();
-
-  /// Ended an incoming/outgoing call
-  Stream<CallKeepBaseData> get onCallEnded => _callEndedController.stream.asBroadcastStream();
-
-  /// Missed an incoming call due to timeout
-  Stream<CallKeepBaseData> get onCallTimedOut => _callTimeOutController.stream.asBroadcastStream();
-
-  /// Calling back after a missed call notification - Android only
-  Stream<CallKeepBaseData> get onCallBack => _callBackController.stream.asBroadcastStream();
-
-  /// CallKit hold was toggled - iOS only
-  Stream<HoldToggleData> get onHoldToggled => _holdToggleController.stream.asBroadcastStream();
-
-  /// CallKit Mute was toggled - iOS only
-  Stream<MuteToggleData> get onMuteToggled => _muteToggleController.stream.asBroadcastStream();
-
-  /// DMTF (Dual Tone Multi Frequency) was toggled - iOS only
-  Stream<DmtfToggleData> get onDmtfToggled => _dmtfToggleController.stream.asBroadcastStream();
-
-  /// Call group was toggled - iOS only
-  Stream<CallGroupToggleData> get onCallGroupToggled =>
-      _callGroupToggleController.stream.asBroadcastStream();
-
-  /// AVAudioSession was toggled (activated/deactivated) - iOS only
-  Stream<bool> get onAudioSessionToggled =>
-      _audioSessionToggleController.stream.asBroadcastStream();
-
-  /// PushKit token was updated for VoIP - iOS only
-  Stream<String> get onPushTokenUpdated => _pushTokenUpdateController.stream.asBroadcastStream();
 
   /// Show Incoming call UI.
   /// On iOS, using Callkit. On Android, using a custom UI.
@@ -119,12 +96,12 @@ class CallKeep {
   /// Get active calls.
   /// On iOS: return active calls from Callkit.
   /// On Android: only return last call
-  Future<List<CallKeepBaseData>> activeCalls() async {
+  Future<List<CallKeepCallData>> activeCalls() async {
     final activeCallsRaw = await _channel.invokeMethod<List>("activeCalls");
     if (activeCallsRaw == null) return [];
     return activeCallsRaw
-        .cast<Map<String, dynamic>>()
-        .map((e) => CallKeepBaseData.fromMap(e))
+        .map<Map<String, dynamic>>((e) => Map<String, dynamic>.from(e))
+        .map((e) => CallKeepCallData.fromMap(e))
         .toList();
   }
 
@@ -135,71 +112,19 @@ class CallKeep {
     return (await _channel.invokeMethod<String>("getDevicePushTokenVoIP")) ?? '';
   }
 
-  void _handleCallKeepEvent(dynamic data) {
+  CallKeepEvent _handleCallKeepEvent(dynamic data) {
     if (data is Map) {
-      final event = callKeepEventTypeFromName('event');
-      final body = data['body'] as Map<String, dynamic>;
-      switch (event) {
-        case CallKeepEventType.devicePushTokenUpdated:
-          if (body['deviceTokenVoIP'] == null) return;
-          _pushTokenUpdateController.add(body['deviceTokenVoIP'] as String);
-          break;
-        case CallKeepEventType.callIncoming:
-          _incomingCallController.add(CallKeepBaseData.fromMap(body));
-          break;
-        case CallKeepEventType.callStart:
-          _callStartController.add(CallKeepBaseData.fromMap(body));
-          break;
-        case CallKeepEventType.callAccept:
-          _callAcceptController.add(CallKeepBaseData.fromMap(body));
-          break;
-        case CallKeepEventType.callDecline:
-          _callDeclineController.add(CallKeepBaseData.fromMap(body));
-          break;
-        case CallKeepEventType.callEnded:
-          _callEndedController.add(CallKeepBaseData.fromMap(body));
-          break;
-        case CallKeepEventType.callTimedOut:
-          _callTimeOutController.add(CallKeepBaseData.fromMap(body));
-          break;
-        case CallKeepEventType.missedCallback:
-          break;
-        case CallKeepEventType.holdToggled:
-          final holdToggleData = HoldToggleData.fromMap(body);
-          _holdToggleController.add(holdToggleData);
-          break;
-        case CallKeepEventType.muteToggled:
-          final muteToggleData = MuteToggleData.fromMap(body);
-          _muteToggleController.add(muteToggleData);
-          break;
-        case CallKeepEventType.dmtfToggled:
-          final dmtfToggleData = DmtfToggleData.fromMap(body);
-          _dmtfToggleController.add(dmtfToggleData);
-          break;
-        case CallKeepEventType.callGroupToggled:
-          final callGroupToggleData = CallGroupToggleData.fromMap(body);
-          _callGroupToggleController.add(callGroupToggleData);
-          break;
-        case CallKeepEventType.audioSessionToggled:
-          _audioSessionToggleController.add(body['isActivate']);
-          break;
+      try {
+        return CallKeepEvent.fromMap(data);
+      } catch (e) {
+        rethrow;
       }
+    } else {
+      throw Exception('Incorrect CallKeep event data: $data');
     }
   }
 
   void close() {
-    _incomingCallController.close();
-    _callStartController.close();
-    _callAcceptController.close();
-    _callDeclineController.close();
-    _callEndedController.close();
-    _callTimeOutController.close();
-    _callBackController.close();
-    _holdToggleController.close();
-    _muteToggleController.close();
-    _dmtfToggleController.close();
-    _callGroupToggleController.close();
-    _audioSessionToggleController.close();
-    _pushTokenUpdateController.close();
+    _eventChannelSubscription.cancel();
   }
 }

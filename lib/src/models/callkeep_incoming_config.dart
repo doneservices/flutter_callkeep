@@ -1,11 +1,24 @@
-import 'package:flutter_callkeep/src/models/calkeep_base_data.dart';
 import 'package:flutter_callkeep/src/models/callkeep_android_config.dart';
 import 'package:flutter_callkeep/src/models/callkeep_base_config.dart';
+import 'package:flutter_callkeep/src/models/callkeep_call_data.dart';
 import 'package:flutter_callkeep/src/models/callkeep_ios_config.dart';
 
-class CallKeepIncomingConfig extends CallKeepBaseData {
+/// The configuration of an incoming call from CallKeep
+class CallKeepIncomingConfig extends CallKeepCallData {
   /// App's name. using for display inside Callkit.
   final String appName;
+
+  /// Call notification content title and full screen incoming call activity header
+  ///
+  /// If [contentTitle] on [CallKeepBaseConfig] is set up, it would default to be ContentTitle(callerName)
+  /// or contentTitle(appName) if [callerName] is `null`
+  ///
+  /// If you override [contentTitle] it would superseed the [CallKeepBaseConfig.contentTitle]
+  ///
+  /// You can assign it to empty [String] to have notification content title be [callerName],
+  /// and full screen header will be "Call from CallKeep", which you can override in your
+  /// `android/app/src/main/res/values/strings.xml` with key `call_header`
+  final String contentTitle;
 
   /// Text Accept to be shown for the user to accept the call
   final String acceptText;
@@ -37,6 +50,7 @@ class CallKeepIncomingConfig extends CallKeepBaseData {
     required String uuid,
     String? callerName,
     String? handle,
+    String? contentTitle,
     String? avatar,
     bool hasVideo = false,
     Map<String, dynamic>? extra,
@@ -47,6 +61,7 @@ class CallKeepIncomingConfig extends CallKeepBaseData {
       callerName: callerName,
       avatar: avatar,
       appName: config.appName,
+      contentTitle: contentTitle ?? config.contentTitle?.call(callerName ?? config.appName) ?? "",
       acceptText: config.acceptText,
       declineText: config.declineText,
       missedCallText: config.missedCallText,
@@ -62,6 +77,7 @@ class CallKeepIncomingConfig extends CallKeepBaseData {
   }
 
   CallKeepIncomingConfig({
+    this.contentTitle = "",
     this.acceptText = 'Accept',
     this.declineText = 'Decline',
     this.missedCallText = 'Missed call',
@@ -90,6 +106,7 @@ class CallKeepIncomingConfig extends CallKeepBaseData {
     return {
       'id': uuid,
       'callerName': callerName,
+      'contentTitle': contentTitle,
       'appName': appName,
       'acceptText': acceptText,
       'declineText': declineText,

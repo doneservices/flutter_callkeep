@@ -1,11 +1,12 @@
-class CallGroupToggleData {
-  final String callUuid;
+import 'package:flutter_callkeep/flutter_callkeep.dart';
+
+class CallGroupToggleData extends CallKeepBaseData {
   final String callUuidToGroupWith;
 
   CallGroupToggleData({
-    required this.callUuid,
+    required String callUuid,
     required this.callUuidToGroupWith,
-  });
+  }) : super(uuid: callUuid);
 
   factory CallGroupToggleData.fromMap(Map<String, dynamic> map) {
     return CallGroupToggleData(

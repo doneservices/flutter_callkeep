@@ -2,11 +2,15 @@
 ///
 /// Holding colors, flags and channel names
 class CallKeepAndroidConfig {
-  /// Using custom notifications.
-  final bool showCustomNotification;
+  /// File name of the app logo to show inside full screen.
+  ///
+  /// No logo will be shown if this is empty
+  final String logo;
 
-  /// Show app's logo inside full screen. /android/src/main/res/drawable-xxxhdpi/ic_logo.png
-  final bool showLogo;
+  /// File name of the notification icon to show inside call notifications.
+  ///
+  /// Default notifications will be shown if this is empty
+  final String notificationIcon;
 
   /// Show a missed call notification when calls timeout
   final bool showMissedCallNotification;
@@ -17,18 +21,13 @@ class CallKeepAndroidConfig {
   /// File name of the ringtone that is put into /android/app/src/main/res/raw/
   final String ringtoneFileName;
 
-  /// Incoming call screen background color in hex
+  /// Incoming call screen/notification accent color in hex
   ///
   /// example value: '#0955fa'
-  final String backgroundColor;
+  final String accentColor;
 
   ///	Using image background for Incoming call screen. example: http://... https://... or 'assets/abc.png'
   final String? backgroundUrl;
-
-  /// Color used in button/text on notification.
-  ///
-  /// example value: '#0955fa'
-  final String actionColor;
 
   /// Notification channel name of incoming call.
   final String incomingCallNotificationChannelName;
@@ -36,28 +35,26 @@ class CallKeepAndroidConfig {
   /// Notification channel name of missed call.
   final String missedCallNotificationChannelName;
   CallKeepAndroidConfig({
-    this.showCustomNotification = false,
-    this.showLogo = false,
+    this.logo = "",
+    this.notificationIcon = "",
     this.showMissedCallNotification = true,
     this.showCallBackAction = true,
     this.ringtoneFileName = 'system_ringtone_default',
-    this.backgroundColor = '#0955fa',
+    this.accentColor = '#0955fa',
     this.backgroundUrl,
-    this.actionColor = '#4CAF50',
     this.incomingCallNotificationChannelName = 'Incoming Calls',
     this.missedCallNotificationChannelName = "Missed Calls",
   });
 
   Map<String, dynamic> toMap() {
     return {
-      'showCustomNotification': showCustomNotification,
-      'showLogo': showLogo,
+      'logo': logo,
+      'notificationIcon': notificationIcon,
       'showMissedCallNotification': showMissedCallNotification,
       'showCallBackAction': showCallBackAction,
       'ringtoneFileName': ringtoneFileName,
-      'backgroundColor': backgroundColor,
+      'accentColor': accentColor,
       'backgroundUrl': backgroundUrl,
-      'actionColor': actionColor,
       'incomingCallNotificationChannelName': incomingCallNotificationChannelName,
       'missedCallNotificationChannelName': missedCallNotificationChannelName,
     };

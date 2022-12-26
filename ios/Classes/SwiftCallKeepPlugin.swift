@@ -38,7 +38,8 @@ public class SwiftCallKeepPlugin: NSObject, FlutterPlugin, CXProviderDelegate {
     private let devicePushTokenVoIP = "DevicePushTokenVoIP"
     
     private func sendEvent(_ event: String, _ body: [String : Any?]?) {
-        eventCallbackHandler?.send(event, body ?? [:] as [String : Any?])
+        let data = body ?? [:] as [String : Any?]
+        eventCallbackHandler?.send(event, data)
     }
     
     @objc public func sendEventCustom(_ event: String, body: Any?) {

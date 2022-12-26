@@ -19,7 +19,7 @@ class CallingPageState extends State<CallingPage> {
   Widget build(BuildContext context) {
     final params =
         jsonDecode(jsonEncode(ModalRoute.of(context)!.settings.arguments as Map<dynamic, dynamic>));
-    calling = CallKeepBaseData.fromMap(params);
+    calling = CallKeepCallData.fromMap(params);
     debugPrint(calling?.toString());
 
     return Scaffold(

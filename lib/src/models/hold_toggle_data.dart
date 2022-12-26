@@ -1,10 +1,12 @@
-class HoldToggleData {
+import 'package:flutter_callkeep/flutter_callkeep.dart';
+
+class HoldToggleData extends CallKeepBaseData {
   final bool isOnHold;
-  final String callUuid;
+
   HoldToggleData({
     required this.isOnHold,
-    required this.callUuid,
-  });
+    required String callUuid,
+  }) : super(uuid: callUuid);
 
   factory HoldToggleData.fromMap(Map<String, dynamic> map) {
     return HoldToggleData(

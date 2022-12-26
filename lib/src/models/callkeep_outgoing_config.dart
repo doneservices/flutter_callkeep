@@ -1,7 +1,7 @@
 import 'package:flutter_callkeep/flutter_callkeep.dart';
 
 /// Holds the configuration for an outgoing call which is needed when starting an outgoing call
-class CallKeepOutgoingConfig extends CallKeepBaseData {
+class CallKeepOutgoingConfig extends CallKeepCallData {
   /// iOS configuration needed for CallKit.
   final CallKeepIosConfig iosConfig;
 

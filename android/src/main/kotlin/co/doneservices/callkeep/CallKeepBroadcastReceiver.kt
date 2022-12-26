@@ -30,26 +30,25 @@ class CallKeepBroadcastReceiver : BroadcastReceiver() {
 
         const val EXTRA_CALLKEEP_ID = "EXTRA_CALLKEEP_ID"
         const val EXTRA_CALLKEEP_CALLER_NAME = "EXTRA_CALLKEEP_CALLER_NAME"
+        const val EXTRA_CALLKEEP_CONTENT_TITLE = "EXTRA_CALLKEEP_CONTENT_TITLE"
         const val EXTRA_CALLKEEP_APP_NAME = "EXTRA_CALLKEEP_APP_NAME"
         const val EXTRA_CALLKEEP_HANDLE = "EXTRA_CALLKEEP_HANDLE"
         const val EXTRA_CALLKEEP_HAS_VIDEO = "EXTRA_CALLKEEP_HAS_VIDEO"
         const val EXTRA_CALLKEEP_AVATAR = "EXTRA_CALLKEEP_AVATAR"
         const val EXTRA_CALLKEEP_DURATION = "EXTRA_CALLKEEP_DURATION"
-        const val EXTRA_CALLKEEP_TEXT_ACCEPT = "EXTRA_CALLKEEP_TEXT_ACCEPT"
-        const val EXTRA_CALLKEEP_TEXT_DECLINE = "EXTRA_CALLKEEP_TEXT_DECLINE"
+        const val EXTRA_CALLKEEP_ACCEPT_TEXT = "EXTRA_CALLKEEP_ACCEPT_TEXT"
+        const val EXTRA_CALLKEEP_DECLINE_TEXT = "EXTRA_CALLKEEP_DECLINE_TEXT"
         const val EXTRA_CALLKEEP_TEXT_MISSED_CALL = "EXTRA_CALLKEEP_TEXT_MISSED_CALL"
-        const val EXTRA_CALLKEEP_TEXT_CALLBACK = "EXTRA_CALLKEEP_TEXT_CALLBACK"
+        const val EXTRA_CALLKEEP_CALLBACK_TEXT = "EXTRA_CALLKEEP_CALLBACK_TEXT"
         const val EXTRA_CALLKEEP_EXTRA = "EXTRA_CALLKEEP_EXTRA"
         const val EXTRA_CALLKEEP_HEADERS = "EXTRA_CALLKEEP_HEADERS"
-        const val EXTRA_CALLKEEP_SHOW_CUSTOM_NOTIFICATION = "EXTRA_CALLKEEP_SHOW_CUSTOM_NOTIFICATION"
-        const val EXTRA_CALLKEEP_IS_CUSTOM_NOTIFICATION_SMALL = "EXTRA_CALLKEEP_IS_CUSTOM_NOTIFICATION_SMALL"
-        const val EXTRA_CALLKEEP_SHOW_LOGO = "EXTRA_CALLKEEP_SHOW_LOGO"
+        const val EXTRA_CALLKEEP_LOGO = "EXTRA_CALLKEEP_LOGO"
+        const val EXTRA_CALLKEEP_NOTIFICATION_ICON = "EXTRA_CALLKEEP_NOTIFICATION_ICON"
         const val EXTRA_CALLKEEP_SHOW_MISSED_CALL_NOTIFICATION = "EXTRA_CALLKEEP_SHOW_MISSED_CALL_NOTIFICATION"
         const val EXTRA_CALLKEEP_SHOW_CALLBACK = "EXTRA_CALLKEEP_SHOW_CALLBACK"
         const val EXTRA_CALLKEEP_RINGTONE_FILE_NAME = "EXTRA_CALLKEEP_RINGTONE_FILE_NAME"
-        const val EXTRA_CALLKEEP_BACKGROUND_COLOR = "EXTRA_CALLKEEP_BACKGROUND_COLOR"
         const val EXTRA_CALLKEEP_BACKGROUND_URL = "EXTRA_CALLKEEP_BACKGROUND_URL"
-        const val EXTRA_CALLKEEP_ACTION_COLOR = "EXTRA_CALLKEEP_ACTION_COLOR"
+        const val EXTRA_CALLKEEP_ACCENT_COLOR = "EXTRA_CALLKEEP_ACCENT_COLOR"
         const val EXTRA_CALLKEEP_INCOMING_CALL_NOTIFICATION_CHANNEL_NAME = "EXTRA_CALLKEEP_INCOMING_CALL_NOTIFICATION_CHANNEL_NAME"
         const val EXTRA_CALLKEEP_MISSED_CALL_NOTIFICATION_CHANNEL_NAME = "EXTRA_CALLKEEP_MISSED_CALL_NOTIFICATION_CHANNEL_NAME"
 
@@ -57,43 +56,43 @@ class CallKeepBroadcastReceiver : BroadcastReceiver() {
 
         fun getIntentIncoming(context: Context, data: Bundle?) =
                 Intent(context, CallKeepBroadcastReceiver::class.java).apply {
-                    action = ACTION_CALL_INCOMING
+                    action = "${context.packageName}.${ACTION_CALL_INCOMING}"
                     putExtra(EXTRA_CALLKEEP_INCOMING_DATA, data)
                 }
 
         fun getIntentStart(context: Context, data: Bundle?) =
                 Intent(context, CallKeepBroadcastReceiver::class.java).apply {
-                    action = ACTION_CALL_START
+                    action = "${context.packageName}.${ACTION_CALL_START}"
                     putExtra(EXTRA_CALLKEEP_INCOMING_DATA, data)
                 }
 
         fun getIntentAccept(context: Context, data: Bundle?) =
                 Intent(context, CallKeepBroadcastReceiver::class.java).apply {
-                    action = ACTION_CALL_ACCEPT
+                    action = "${context.packageName}.${ACTION_CALL_ACCEPT}"
                     putExtra(EXTRA_CALLKEEP_INCOMING_DATA, data)
                 }
 
         fun getIntentDecline(context: Context, data: Bundle?) =
                 Intent(context, CallKeepBroadcastReceiver::class.java).apply {
-                    action = ACTION_CALL_DECLINE
+                    action = "${context.packageName}.${ACTION_CALL_DECLINE}"
                     putExtra(EXTRA_CALLKEEP_INCOMING_DATA, data)
                 }
 
         fun getIntentEnded(context: Context, data: Bundle?) =
                 Intent(context, CallKeepBroadcastReceiver::class.java).apply {
-                    action = ACTION_CALL_ENDED
+                    action = "${context.packageName}.${ACTION_CALL_ENDED}"
                     putExtra(EXTRA_CALLKEEP_INCOMING_DATA, data)
                 }
 
         fun getIntentTimeout(context: Context, data: Bundle?) =
                 Intent(context, CallKeepBroadcastReceiver::class.java).apply {
-                    action = ACTION_CALL_TIMEOUT
+                    action = "${context.packageName}.${ACTION_CALL_TIMEOUT}"
                     putExtra(EXTRA_CALLKEEP_INCOMING_DATA, data)
                 }
 
         fun getIntentCallback(context: Context, data: Bundle?) =
                 Intent(context, CallKeepBroadcastReceiver::class.java).apply {
-                    action = ACTION_CALL_CALLBACK
+                    action = "${context.packageName}.${ACTION_CALL_CALLBACK}"
                     putExtra(EXTRA_CALLKEEP_INCOMING_DATA, data)
                 }
     }
@@ -105,7 +104,7 @@ class CallKeepBroadcastReceiver : BroadcastReceiver() {
         val action = intent.action ?: return
         val data = intent.extras?.getBundle(EXTRA_CALLKEEP_INCOMING_DATA) ?: return
         when (action) {
-            ACTION_CALL_INCOMING -> {
+            "${context.packageName}.${ACTION_CALL_INCOMING}" -> {
                 try {
                     callKeepNotificationManager.showIncomingNotification(data)
                     sendEventFlutter(ACTION_CALL_INCOMING, data)
@@ -121,7 +120,7 @@ class CallKeepBroadcastReceiver : BroadcastReceiver() {
                     error.printStackTrace()
                 }
             }
-            ACTION_CALL_START -> {
+            "${context.packageName}.${ACTION_CALL_START}" -> {
                 try {
                     sendEventFlutter(ACTION_CALL_START, data)
                     addCall(context, Data.fromBundle(data), true)
@@ -129,7 +128,7 @@ class CallKeepBroadcastReceiver : BroadcastReceiver() {
                     error.printStackTrace()
                 }
             }
-            ACTION_CALL_ACCEPT -> {
+            "${context.packageName}.${ACTION_CALL_ACCEPT}" -> {
                 try {
                     sendEventFlutter(ACTION_CALL_ACCEPT, data)
                     context.stopService(Intent(context, CallKeepSoundPlayerService::class.java))
@@ -139,7 +138,7 @@ class CallKeepBroadcastReceiver : BroadcastReceiver() {
                     error.printStackTrace()
                 }
             }
-            ACTION_CALL_DECLINE -> {
+            "${context.packageName}.${ACTION_CALL_DECLINE}" -> {
                 try {
                     sendEventFlutter(ACTION_CALL_DECLINE, data)
                     context.stopService(Intent(context, CallKeepSoundPlayerService::class.java))
@@ -149,7 +148,7 @@ class CallKeepBroadcastReceiver : BroadcastReceiver() {
                     error.printStackTrace()
                 }
             }
-            ACTION_CALL_ENDED -> {
+            "${context.packageName}.${ACTION_CALL_ENDED}" -> {
                 try {
                     sendEventFlutter(ACTION_CALL_ENDED, data)
                     context.stopService(Intent(context, CallKeepSoundPlayerService::class.java))
@@ -159,7 +158,7 @@ class CallKeepBroadcastReceiver : BroadcastReceiver() {
                     error.printStackTrace()
                 }
             }
-            ACTION_CALL_TIMEOUT -> {
+            "${context.packageName}.${ACTION_CALL_TIMEOUT}" -> {
                 try {
                     sendEventFlutter(ACTION_CALL_TIMEOUT, data)
                     context.stopService(Intent(context, CallKeepSoundPlayerService::class.java))
@@ -171,7 +170,7 @@ class CallKeepBroadcastReceiver : BroadcastReceiver() {
                     error.printStackTrace()
                 }
             }
-            ACTION_CALL_CALLBACK -> {
+            "${context.packageName}${ACTION_CALL_CALLBACK}" -> {
                 try {
                     callKeepNotificationManager.clearMissCallNotification(data)
                     sendEventFlutter(ACTION_CALL_CALLBACK, data)
@@ -187,31 +186,33 @@ class CallKeepBroadcastReceiver : BroadcastReceiver() {
     }
 
     @Suppress("UNCHECKED_CAST")
-    private fun sendEventFlutter(event: String, data: Bundle) {
+    private fun sendEventFlutter(event: String, bundle: Bundle) {
+        CallKeepPlugin.sendEvent(event, bundle.toData())
+    }
+    
+    @Suppress("UNCHECKED_CAST")
+    private fun Bundle.toData(): Map<String, Any> {
         val android = mapOf(
-                "showCustomNotification" to data.getBoolean(EXTRA_CALLKEEP_SHOW_CUSTOM_NOTIFICATION, false),
-                "isCustomNotificationSmall" to data.getBoolean(EXTRA_CALLKEEP_IS_CUSTOM_NOTIFICATION_SMALL, false),
-                "ringtoneFileName" to data.getString(EXTRA_CALLKEEP_RINGTONE_FILE_NAME, ""),
-                "backgroundColor" to data.getString(EXTRA_CALLKEEP_BACKGROUND_COLOR, ""),
-                "backgroundUrl" to data.getString(EXTRA_CALLKEEP_BACKGROUND_URL, ""),
-                "actionColor" to data.getString(EXTRA_CALLKEEP_ACTION_COLOR, ""),
-                "incomingCallNotificationChannelName" to data.getString(EXTRA_CALLKEEP_INCOMING_CALL_NOTIFICATION_CHANNEL_NAME, ""),
-                "missedCallNotificationChannelName" to data.getString(EXTRA_CALLKEEP_MISSED_CALL_NOTIFICATION_CHANNEL_NAME, ""),
+            "ringtoneFileName" to getString(EXTRA_CALLKEEP_RINGTONE_FILE_NAME, ""),
+            "accentColor" to getString(EXTRA_CALLKEEP_ACCENT_COLOR, ""),
+            "backgroundUrl" to getString(EXTRA_CALLKEEP_BACKGROUND_URL, ""),
+            "incomingCallNotificationChannelName" to getString(EXTRA_CALLKEEP_INCOMING_CALL_NOTIFICATION_CHANNEL_NAME, ""),
+            "missedCallNotificationChannelName" to getString(EXTRA_CALLKEEP_MISSED_CALL_NOTIFICATION_CHANNEL_NAME, ""),
         )
-        val forwardData = mapOf(
-                "id" to data.getString(EXTRA_CALLKEEP_ID, ""),
-                "callerName" to data.getString(EXTRA_CALLKEEP_CALLER_NAME, ""),
-                "avatar" to data.getString(EXTRA_CALLKEEP_AVATAR, ""),
-                "number" to data.getString(EXTRA_CALLKEEP_HANDLE, ""),
-                "hasVideo" to data.getBoolean(EXTRA_CALLKEEP_HAS_VIDEO, false),
-                "duration" to data.getLong(EXTRA_CALLKEEP_DURATION, 0L),
-                "acceptText" to data.getString(EXTRA_CALLKEEP_TEXT_ACCEPT, ""),
-                "declineText" to data.getString(EXTRA_CALLKEEP_TEXT_DECLINE, ""),
-                "missedCallText" to data.getString(EXTRA_CALLKEEP_TEXT_MISSED_CALL, ""),
-                "callBackText" to data.getString(EXTRA_CALLKEEP_TEXT_CALLBACK, ""),
-                "extra" to data.getSerializable(EXTRA_CALLKEEP_EXTRA) as HashMap<String, Any?>,
-                "android" to android
+        return mapOf(
+            "id" to getString(EXTRA_CALLKEEP_ID, ""),
+            "callerName" to getString(EXTRA_CALLKEEP_CALLER_NAME, ""),
+            "contentTitle" to getString(EXTRA_CALLKEEP_CONTENT_TITLE, ""),
+            "avatar" to getString(EXTRA_CALLKEEP_AVATAR, ""),
+            "number" to getString(EXTRA_CALLKEEP_HANDLE, ""),
+            "hasVideo" to getBoolean(EXTRA_CALLKEEP_HAS_VIDEO, false),
+            "duration" to getLong(EXTRA_CALLKEEP_DURATION, 0L),
+            "acceptText" to getString(EXTRA_CALLKEEP_ACCEPT_TEXT, ""),
+            "declineText" to getString(EXTRA_CALLKEEP_DECLINE_TEXT, ""),
+            "missedCallText" to getString(EXTRA_CALLKEEP_TEXT_MISSED_CALL, ""),
+            "callBackText" to getString(EXTRA_CALLKEEP_CALLBACK_TEXT, ""),
+            "extra" to getSerializable(EXTRA_CALLKEEP_EXTRA) as HashMap<String, Any?>,
+            "android" to android
         )
-        CallKeepPlugin.sendEvent(event, forwardData)
     }
 }

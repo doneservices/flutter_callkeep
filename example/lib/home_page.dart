@@ -122,16 +122,14 @@ class HomePageState extends State<HomePage> {
         extra: <String, dynamic>{'userId': '1a2b3c4d'},
         headers: <String, dynamic>{'apiKey': 'Abc@123!', 'platform': 'flutter'},
         androidConfig: CallKeepAndroidConfig(
-          showCustomNotification: true,
-          showLogo: false,
+          logo: "ic_logo",
           showCallBackAction: true,
           showMissedCallNotification: true,
           ringtoneFileName: 'system_ringtone_default',
-          backgroundColor: '#0955fa',
+          accentColor: '#0955fa',
           backgroundUrl: 'assets/test.png',
-          actionColor: '#4CAF50',
-          incomingCallNotificationChannelName: 'Incoming Call',
-          missedCallNotificationChannelName: 'Missed Call',
+          incomingCallNotificationChannelName: 'Incoming Calls',
+          missedCallNotificationChannelName: 'Missed Calls',
         ),
         iosConfig: CallKeepIosConfig(
           iconName: 'CallKitLogo',
@@ -186,15 +184,27 @@ class HomePageState extends State<HomePage> {
   }
 
   Future<void> listenerEvent(Function? callback) async {
-    // TODO: Implement other listeners
     try {
-      CallKeep.instance.onCallAccepted.listen((data) {
-        NavigationService.instance.pushNamedIfNotCurrent(AppRoute.callingPage, args: data.toMap());
-        if (callback != null) callback.call();
-      });
-      CallKeep.instance.onCallDeclined.listen((data) async {
-        await requestHttp("ACTION_CALL_DECLINE_FROM_DART");
-        if (callback != null) callback.call();
+      CallKeep.instance.onEvent.listen((event) async {
+        // TODO: Implement other events
+        if (event == null) return;
+        switch (event.type) {
+          case CallKeepEventType.callAccept:
+            final data = event.data as CallKeepCallData;
+            print('call answered: ${data.toMap()}');
+            NavigationService.instance
+                .pushNamedIfNotCurrent(AppRoute.callingPage, args: data.toMap());
+            if (callback != null) callback.call(event);
+            break;
+          case CallKeepEventType.callDecline:
+            final data = event.data as CallKeepCallData;
+            print('call declined: ${data.toMap()}');
+            await requestHttp("ACTION_CALL_DECLINE_FROM_DART");
+            if (callback != null) callback.call(data);
+            break;
+          default:
+            break;
+        }
       });
     } on Exception {}
   }

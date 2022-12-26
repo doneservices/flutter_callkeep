@@ -36,7 +36,7 @@ PODS:
     - GoogleUtilities/UserDefaults (~> 7.7)
     - nanopb (~> 2.30908.0)
   - Flutter (1.0.0)
-  - flutter_callkeep (0.0.1):
+  - flutter_callkeep (1.0.0):
     - CryptoSwift
     - Flutter
   - GoogleDataTransport (9.1.4):
@@ -106,7 +106,7 @@ SPEC CHECKSUMS:
   FirebaseInstallations: 40bd9054049b2eae9a2c38ef1c3dd213df3605cd
   FirebaseMessaging: 5e5118a2383b3531e730d974680954c679ca0a13
   Flutter: f04841e97a9d0b0a8025694d0796dd46242b2854
-  flutter_callkeep: 417dd1b46541cdd5d855ad795ccbe97d1c18155e
+  flutter_callkeep: 5405af5c6d9b48974c20c56ce1c8a9b110788157
   GoogleDataTransport: 5fffe35792f8b96ec8d6775f5eccd83c998d5a3b
   GoogleUtilities: e0913149f6b0625b553d70dae12b49fc62914fd1
   nanopb: a0ba3315591a9ae0a16a309ee504766e90db0c96

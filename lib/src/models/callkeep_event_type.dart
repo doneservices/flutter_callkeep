@@ -47,16 +47,12 @@ CallKeepEventType callKeepEventTypeFromName(String eventName) {
       return CallKeepEventType.callIncoming;
     case 'co.doneservices.callkeep.ACTION_CALL_START':
       return CallKeepEventType.callStart;
-
     case 'co.doneservices.callkeep.ACTION_CALL_ACCEPT':
       return CallKeepEventType.callAccept;
-
     case 'co.doneservices.callkeep.ACTION_CALL_DECLINE':
       return CallKeepEventType.callDecline;
-
     case 'co.doneservices.callkeep.ACTION_CALL_ENDED':
       return CallKeepEventType.callEnded;
-
     case 'co.doneservices.callkeep.ACTION_CALL_TIMEOUT':
       return CallKeepEventType.callTimedOut;
     case 'co.doneservices.callkeep.ACTION_CALL_CALLBACK':

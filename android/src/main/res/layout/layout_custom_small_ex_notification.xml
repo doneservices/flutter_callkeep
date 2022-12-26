@@ -30,7 +30,7 @@
             android:orientation="vertical">
 
             <TextView
-                android:id="@+id/tvcallerName"
+                android:id="@+id/tvCallerName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:singleLine="true"
@@ -90,7 +90,7 @@
                     android:layout_marginRight="@dimen/base_margin_half"
                     android:visibility="gone"
                     android:gravity="center"
-                    android:text="@string/text_decline"
+                    android:text="@string/decline_text"
                     android:textAllCaps="false"
                     android:textColor="@color/action_text" />
 
@@ -128,7 +128,7 @@
                     android:layout_marginLeft="@dimen/base_margin_half"
                     android:layout_marginRight="@dimen/base_margin_half"
                     android:gravity="center"
-                    android:text="@string/text_accept"
+                    android:text="@string/accept_text"
                     android:visibility="gone"
                     android:textAllCaps="false"
                     android:textColor="@color/action_text" />

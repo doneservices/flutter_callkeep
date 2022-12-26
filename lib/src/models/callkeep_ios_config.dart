@@ -83,6 +83,14 @@ class CallKeepIosConfig {
 
 enum CallKitHandleType { generic, number, email }
 
+CallKitHandleType callKitHandleTypeFromName(String name) {
+  try {
+    return CallKitHandleType.values.byName(name);
+  } catch (e) {
+    return CallKitHandleType.generic;
+  }
+}
+
 enum AvAudioSessionMode {
   gameChat,
   measurement,

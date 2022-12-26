@@ -9,6 +9,14 @@ class CallKeepBaseConfig {
   /// App's name. using for display inside Callkit.
   final String appName;
 
+  /// A function that is the base for [CallKeepIncomingConfig.contentTitle]
+  ///
+  /// Good example would be "Call from $callerName" or "Call from $appName"
+  ///
+  /// The argument passed to it would be the [CallKeepIncomingConfig.callerName]
+  /// or [appName] if the aformentioned is `null`
+  final String Function(String argument)? contentTitle;
+
   /// Text Accept to be shown for the user to accept the call
   final String acceptText;
 
@@ -32,6 +40,7 @@ class CallKeepBaseConfig {
 
   CallKeepBaseConfig({
     required this.appName,
+    this.contentTitle,
     this.acceptText = 'Accept',
     this.declineText = 'Decline',
     this.missedCallText = 'Missed call',

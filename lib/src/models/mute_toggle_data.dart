@@ -1,11 +1,12 @@
-class MuteToggleData {
-  final String callUuid;
+import 'package:flutter_callkeep/flutter_callkeep.dart';
+
+class MuteToggleData extends CallKeepBaseData {
   final bool isMuted;
 
   MuteToggleData({
-    required this.callUuid,
+    required String callUuid,
     required this.isMuted,
-  });
+  }) : super(uuid: callUuid);
 
   factory MuteToggleData.fromMap(Map<String, dynamic> map) {
     return MuteToggleData(

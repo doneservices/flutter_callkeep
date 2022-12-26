@@ -22,18 +22,19 @@ import android.view.animation.AnimationUtils
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import android.widget.Button
 import co.doneservices.callkeep.CallKeepBroadcastReceiver.Companion.ACTION_CALL_INCOMING
 import co.doneservices.callkeep.CallKeepBroadcastReceiver.Companion.EXTRA_CALLKEEP_AVATAR
 import co.doneservices.callkeep.CallKeepBroadcastReceiver.Companion.EXTRA_CALLKEEP_BACKGROUND_URL
-import co.doneservices.callkeep.CallKeepBroadcastReceiver.Companion.EXTRA_CALLKEEP_BACKGROUND_COLOR
+import co.doneservices.callkeep.CallKeepBroadcastReceiver.Companion.EXTRA_CALLKEEP_ACCENT_COLOR
 import co.doneservices.callkeep.CallKeepBroadcastReceiver.Companion.EXTRA_CALLKEEP_DURATION
 import co.doneservices.callkeep.CallKeepBroadcastReceiver.Companion.EXTRA_CALLKEEP_INCOMING_DATA
 import co.doneservices.callkeep.CallKeepBroadcastReceiver.Companion.EXTRA_CALLKEEP_CALLER_NAME
+import co.doneservices.callkeep.CallKeepBroadcastReceiver.Companion.EXTRA_CALLKEEP_CONTENT_TITLE
 import co.doneservices.callkeep.CallKeepBroadcastReceiver.Companion.EXTRA_CALLKEEP_HANDLE
 import co.doneservices.callkeep.CallKeepBroadcastReceiver.Companion.EXTRA_CALLKEEP_HEADERS
-import co.doneservices.callkeep.CallKeepBroadcastReceiver.Companion.EXTRA_CALLKEEP_SHOW_LOGO
+import co.doneservices.callkeep.CallKeepBroadcastReceiver.Companion.EXTRA_CALLKEEP_LOGO
 import co.doneservices.callkeep.CallKeepBroadcastReceiver.Companion.EXTRA_CALLKEEP_HAS_VIDEO
-import co.doneservices.callkeep.widgets.RippleRelativeLayout
 import com.squareup.picasso.Picasso
 import de.hdodenhof.circleimageview.CircleImageView
 import kotlin.math.abs
@@ -43,8 +44,8 @@ import android.view.ViewGroup.MarginLayoutParams
 import android.os.PowerManager
 import android.os.PowerManager.WakeLock
 import android.text.TextUtils
-import co.doneservices.callkeep.CallKeepBroadcastReceiver.Companion.EXTRA_CALLKEEP_TEXT_ACCEPT
-import co.doneservices.callkeep.CallKeepBroadcastReceiver.Companion.EXTRA_CALLKEEP_TEXT_DECLINE
+import co.doneservices.callkeep.CallKeepBroadcastReceiver.Companion.EXTRA_CALLKEEP_ACCEPT_TEXT
+import co.doneservices.callkeep.CallKeepBroadcastReceiver.Companion.EXTRA_CALLKEEP_DECLINE_TEXT
 
 
 class IncomingCallActivity : Activity() {
@@ -54,15 +55,15 @@ class IncomingCallActivity : Activity() {
         const val ACTION_ENDED_CALL_INCOMING =
                 "co.doneservices.callkeep.ACTION_ENDED_CALL_INCOMING"
 
-        fun getIntent(data: Bundle) = Intent(ACTION_CALL_INCOMING).apply {
-            action = ACTION_CALL_INCOMING
+        fun getIntent(context: Context, data: Bundle) = Intent(ACTION_CALL_INCOMING).apply {
+            action = "${context.packageName}.${ACTION_CALL_INCOMING}"
             putExtra(EXTRA_CALLKEEP_INCOMING_DATA, data)
             flags =
                     Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_REORDER_TO_FRONT
         }
 
-        fun getIntentEnded() =
-                Intent(ACTION_ENDED_CALL_INCOMING)
+        fun getIntentEnded(context: Context) =
+                Intent("${context.packageName}.${ACTION_ENDED_CALL_INCOMING}")
 
     }
 
@@ -80,20 +81,15 @@ class IncomingCallActivity : Activity() {
 
     private var endedCallKeepBroadcastReceiver = EndedCallKeepBroadcastReceiver()
 
-    private lateinit var ivBackground: ImageView
-    private lateinit var llBackgroundAnimation: RippleRelativeLayout
+    private lateinit var llBackground: LinearLayout
 
-    private lateinit var tvcallerName: TextView
-    private lateinit var tvNumber: TextView
+    private lateinit var tvCallerName: TextView
+    private lateinit var tvCallHeader: TextView
     private lateinit var ivLogo: ImageView
-    private lateinit var ivAvatar: CircleImageView
 
-    private lateinit var llAction: LinearLayout
-    private lateinit var ivAcceptCall: ImageView
-    private lateinit var tvAccept: TextView
+    private lateinit var btnAnswer: Button
 
-    private lateinit var ivDeclineCall: ImageView
-    private lateinit var tvDecline: TextView
+    private lateinit var btnDecline: Button
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -108,7 +104,7 @@ class IncomingCallActivity : Activity() {
             window.addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD)
         }
         transparentStatusAndNavigation()
-        setContentView(R.layout.activity_callkit_incoming)
+        setContentView(R.layout.activity_call_incoming)
         initView()
         incomingData(intent)
         registerReceiver(
@@ -165,54 +161,34 @@ class IncomingCallActivity : Activity() {
         val data = intent.extras?.getBundle(EXTRA_CALLKEEP_INCOMING_DATA)
         if (data == null) finish()
 
-        tvcallerName.text = data?.getString(EXTRA_CALLKEEP_CALLER_NAME, "")
-        tvNumber.text = data?.getString(EXTRA_CALLKEEP_HANDLE, "")
+        tvCallerName.text = data?.getString(EXTRA_CALLKEEP_CALLER_NAME, "")
+        tvCallHeader.text = data?.getString(EXTRA_CALLKEEP_CONTENT_TITLE, "")
 
-        val showLogo = data?.getBoolean(EXTRA_CALLKEEP_SHOW_LOGO, false)
-        ivLogo.visibility = if (showLogo == true) View.VISIBLE else View.INVISIBLE
 
-        val avatarUrl = data?.getString(EXTRA_CALLKEEP_AVATAR, "")
-        if (avatarUrl != null && avatarUrl.isNotEmpty()) {
-            ivAvatar.visibility = View.VISIBLE
-            val headers = data.getSerializable(EXTRA_CALLKEEP_HEADERS) as HashMap<String, Any?>
-            getPicassoInstance(this@IncomingCallActivity, headers)
-                    .load(avatarUrl)
-                    .placeholder(R.drawable.ic_default_avatar)
-                    .error(R.drawable.ic_default_avatar)
-                    .into(ivAvatar)
+        val logo = data?.getString(EXTRA_CALLKEEP_LOGO, "")
+        if(logo?.isNotEmpty() == true){
+            val identifier = this.resources.getIdentifier(logo, "drawable", this.packageName)
+            ivLogo.setImageResource(identifier)
         }
+        ivLogo.visibility = if (logo?.isNotEmpty() == true) View.VISIBLE else View.INVISIBLE
 
-        val hasVideo = data?.getInt(EXTRA_CALLKEEP_HAS_VIDEO, false) ?: false
+
+        val hasVideo = data?.getBoolean(EXTRA_CALLKEEP_HAS_VIDEO, false) ?: false
         if (hasVideo) {
-            ivAcceptCall.setImageResource(R.drawable.ic_video)
+            val top = getResources().getDrawable(R.drawable.ic_video);
+            btnAnswer.setCompoundDrawablesWithIntrinsicBounds(null, top, null, null);
         }
         val duration = data?.getLong(EXTRA_CALLKEEP_DURATION, 0L) ?: 0L
         wakeLockRequest(duration)
 
         finishTimeout(data, duration)
 
-        val acceptText = data?.getString(EXTRA_CALLKEEP_TEXT_ACCEPT, "")
-        tvAccept.text = if (TextUtils.isEmpty(acceptText)) getString(R.string.text_accept) else acceptText
-        val declineText = data?.getString(EXTRA_CALLKEEP_TEXT_DECLINE, "")
-        tvDecline.text = if (TextUtils.isEmpty(declineText)) getString(R.string.text_decline) else declineText
-
-        val backgroundColor = data?.getString(EXTRA_CALLKEEP_BACKGROUND_COLOR, "#0955fa")
+        val accentColor = data?.getString(EXTRA_CALLKEEP_ACCENT_COLOR, "#0955fa")
         try {
-            ivBackground.setBackgroundColor(Color.parseColor(backgroundColor))
+            llBackground.setBackgroundColor(Color.parseColor(accentColor))
         } catch (error: Exception) {
         }
-        var backgroundUrl = data?.getString(EXTRA_CALLKEEP_BACKGROUND_URL, "")
-        if (backgroundUrl != null && backgroundUrl.isNotEmpty()) {
-            if (!backgroundUrl.startsWith("http://", true) && !backgroundUrl.startsWith("https://", true)){
-                backgroundUrl = String.format("file:///android_asset/flutter_assets/%s", backgroundUrl)
-            }
-            val headers = data?.getSerializable(EXTRA_CALLKEEP_HEADERS) as HashMap<String, Any?>
-            getPicassoInstance(this@IncomingCallActivity, headers)
-                    .load(backgroundUrl)
-                    .placeholder(R.drawable.transparent)
-                    .error(R.drawable.transparent)
-                    .into(ivBackground)
-        }
+
     }
 
     private fun finishTimeout(data: Bundle?, duration: Long) {
@@ -234,33 +210,20 @@ class IncomingCallActivity : Activity() {
     }
 
     private fun initView() {
-        ivBackground = findViewById(R.id.ivBackground)
-        llBackgroundAnimation = findViewById(R.id.llBackgroundAnimation)
-        llBackgroundAnimation.layoutParams.height =
-                Utils.getScreenWidth() + Utils.getStatusBarHeight(this@IncomingCallActivity)
-        llBackgroundAnimation.startRippleAnimation()
+        llBackground = findViewById(R.id.llBackground)
 
-        tvcallerName = findViewById(R.id.tvcallerName)
-        tvNumber = findViewById(R.id.tvNumber)
+        tvCallerName = findViewById(R.id.tvCallerName)
+        tvCallHeader = findViewById(R.id.tvCallHeader)
         ivLogo = findViewById(R.id.ivLogo)
-        ivAvatar = findViewById(R.id.ivAvatar)
 
-        llAction = findViewById(R.id.llAction)
-
-        val params = llAction.layoutParams as MarginLayoutParams
-        params.setMargins(0, 0, 0, Utils.getNavigationBarHeight(this@IncomingCallActivity))
-        llAction.layoutParams = params
-
-        ivAcceptCall = findViewById(R.id.ivAcceptCall)
-        tvAccept = findViewById(R.id.tvAccept)
-        ivDeclineCall = findViewById(R.id.ivDeclineCall)
-        tvDecline = findViewById(R.id.tvDecline)
+        btnAnswer = findViewById(R.id.btnAnswer)
+        btnDecline = findViewById(R.id.btnDecline)
         animateAcceptCall()
 
-        ivAcceptCall.setOnClickListener {
+        btnAnswer.setOnClickListener {
             onAcceptClick()
         }
-        ivDeclineCall.setOnClickListener {
+        btnDecline.setOnClickListener {
             onDeclineClick()
         }
     }
@@ -268,7 +231,7 @@ class IncomingCallActivity : Activity() {
     private fun animateAcceptCall() {
         val shakeAnimation =
                 AnimationUtils.loadAnimation(this@IncomingCallActivity, R.anim.shake_anim)
-        ivAcceptCall.animation = shakeAnimation
+        btnAnswer.animation = shakeAnimation
     }
 
 
@@ -303,6 +266,11 @@ class IncomingCallActivity : Activity() {
         val intent =
                 CallKeepBroadcastReceiver.getIntentDecline(this@IncomingCallActivity, data)
         sendBroadcast(intent)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            finishAndRemoveTask()
+        } else {
+            finish()
+        }
     }
 
     private fun getPicassoInstance(context: Context, headers: HashMap<String, Any?>): Picasso {

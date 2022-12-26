@@ -29,16 +29,14 @@ Future<void> displayIncomingCall(String uuid) async {
     extra: <String, dynamic>{'userId': '1a2b3c4d'},
     headers: <String, dynamic>{'apiKey': 'Abc@123!', 'platform': 'flutter'},
     androidConfig: CallKeepAndroidConfig(
-      showCustomNotification: true,
-      showLogo: false,
+      logo: "ic_logo",
       showCallBackAction: true,
       showMissedCallNotification: true,
       ringtoneFileName: 'system_ringtone_default',
-      backgroundColor: '#0955fa',
+      accentColor: '#0955fa',
       backgroundUrl: 'assets/test.png',
-      actionColor: '#4CAF50',
-      incomingCallNotificationChannelName: 'Incoming Call',
-      missedCallNotificationChannelName: 'Missed Call',
+      incomingCallNotificationChannelName: 'Incoming Calls',
+      missedCallNotificationChannelName: 'Missed Calls',
     ),
     iosConfig: CallKeepIosConfig(
       iconName: 'CallKitLogo',
@@ -85,7 +83,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
     checkAndNavigationCallingPage();
   }
 
-  getCurrentCall() async {
+  Future<CallKeepCallData?> getCurrentCall() async {
     //check current call from pushkit if possible
     var calls = await CallKeep.instance.activeCalls();
     if (calls.isNotEmpty) {
@@ -100,8 +98,10 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
 
   checkAndNavigationCallingPage() async {
     var currentCall = await getCurrentCall();
+    print('not answered call ${currentCall?.toMap()}');
     if (currentCall != null) {
-      NavigationService.instance.pushNamedIfNotCurrent(AppRoute.callingPage, args: currentCall);
+      NavigationService.instance
+          .pushNamedIfNotCurrent(AppRoute.callingPage, args: currentCall.toMap());
     }
   }
 
