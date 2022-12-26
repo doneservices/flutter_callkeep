@@ -125,7 +125,7 @@ public class Call: NSObject {
     @objc public var appName: String
     @objc public var handle: String
     @objc public var avatar: String
-    @objc public var hasVIDEO: Bool
+    @objc public var hasVideo: Bool
     @objc public var duration: Int
     @objc public var extra: NSDictionary
     

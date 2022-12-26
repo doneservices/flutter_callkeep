@@ -37,7 +37,7 @@ import flutter_callkeep
         let data = flutter_callkeep.Data(id: UUID().uuidString, nameCaller: nameCaller, handle: handle, type: isVideo ? 1 : 0)
         //set more data...
         data.nameCaller = "Johnny"
-        SwiftFlutterCallkitIncomingPlugin.sharedInstance?.startCall(data, fromPushKit: true)
+        SwiftCallKeepPlugin.sharedInstance?.startCall(data, fromPushKit: true)
         
         return super.application(application, continue: userActivity, restorationHandler: restorationHandler)
     }
@@ -48,12 +48,12 @@ import flutter_callkeep
         let deviceToken = credentials.token.map { String(format: "%02x", $0) }.joined()
         print(deviceToken)
         //Save deviceToken to your server
-        SwiftFlutterCallkitIncomingPlugin.sharedInstance?.setDevicePushTokenVoIP(deviceToken)
+        SwiftCallKeepPlugin.sharedInstance?.setDevicePushTokenVoIP(deviceToken)
     }
     
     func pushRegistry(_ registry: PKPushRegistry, didInvalidatePushTokenFor type: PKPushType) {
         print("didInvalidatePushTokenFor")
-        SwiftFlutterCallkitIncomingPlugin.sharedInstance?.setDevicePushTokenVoIP("")
+        SwiftCallKeepPlugin.sharedInstance?.setDevicePushTokenVoIP("")
     }
     
     // Handle incoming pushes
@@ -71,7 +71,7 @@ import flutter_callkeep
         data.extra = ["user": "abc@123", "platform": "ios"]
         //data.iconName = ...
         //data.....
-        SwiftFlutterCallkitIncomingPlugin.sharedInstance?.showCallkitIncoming(data, fromPushKit: true)
+        SwiftCallKeepPlugin.sharedInstance?.displayIncomingCall(data, fromPushKit: true)
     }
     
     
