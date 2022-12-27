@@ -11,7 +11,7 @@ class AudioSessionToggleData extends CallKeepBaseData {
   factory AudioSessionToggleData.fromMap(Map<String, dynamic> map) {
     return AudioSessionToggleData(
       callUuid: map['id'] ?? '',
-      isActivated: map['isActivated'] ?? false,
+      isActivated: map['isActivate'] ?? false,
     );
   }
 }

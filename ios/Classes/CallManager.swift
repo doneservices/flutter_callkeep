@@ -49,13 +49,13 @@ class CallManager: NSObject {
         self.requestCall(callTransaction, action: "endCall")
     }
     
-    func endCallAlls() {
+    func endAllCalls() {
         let calls = callController.callObserver.calls
         for call in calls {
             let endCallAction = CXEndCallAction(call: call.uuid)
             let callTransaction = CXTransaction()
             callTransaction.addAction(endCallAction)
-            self.requestCall(callTransaction, action: "endCallAlls")
+            self.requestCall(callTransaction, action: "endAllCalls")
         }
     }
     
@@ -92,7 +92,7 @@ class CallManager: NSObject {
             }else {
                 if(action == "startCall"){
                     //push notification for Start Call
-                }else if(action == "endCall" || action == "endCallAlls"){
+                }else if(action == "endCall" || action == "endAllCalls"){
                     //push notification for End Call
                 }
                 completion?(error == nil)
@@ -132,6 +132,13 @@ class CallManager: NSObject {
             strongSelf.callsChangedHandler?()
             strongSelf.postCallNotification()
         }
+        callsChangedHandler?()
+        postCallNotification()
+    }
+    
+    func updateCall(_ updatedCall: Call){
+        guard let idx = calls.firstIndex(where: { $0.uuid == updatedCall.uuid }) else { return }
+        calls.replaceSubrange(idx...idx, with: [updatedCall])
         callsChangedHandler?()
         postCallNotification()
     }

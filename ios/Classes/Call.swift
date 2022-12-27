@@ -126,6 +126,7 @@ public class Call: NSObject {
     @objc public var handle: String
     @objc public var avatar: String
     @objc public var hasVideo: Bool
+    @objc public var isAccepted: Bool
     @objc public var duration: Int
     @objc public var extra: NSDictionary
     
@@ -153,6 +154,7 @@ public class Call: NSObject {
         self.handle = handle
         self.avatar = ""
         self.hasVideo = hasVideo
+        self.isAccepted = false
         self.duration = 30000
         self.extra = [:]
         self.iconName = "CallKeepLogo"
@@ -187,6 +189,7 @@ public class Call: NSObject {
         self.handle = args["handle"] as? String ?? ""
         self.avatar = args["avatar"] as? String ?? ""
         self.hasVideo = args["hasVideo"] as? Bool ?? false
+        self.isAccepted = args["isAccepted"] as? Bool ?? false
         self.duration = args["duration"] as? Int ?? 30000
         self.extra = args["extra"] as? NSDictionary ?? [:]
         
@@ -252,6 +255,7 @@ public class Call: NSObject {
             "handle": handle,
             "avatar": avatar,
             "hasVideo": hasVideo,
+            "isAccepted": isAccepted,
             "duration": duration,
             "extra": extra,
             "ios": ios
