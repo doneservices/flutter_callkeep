@@ -183,7 +183,9 @@ class CallKeepNotificationManager(private val context: Context) {
         )
         val missedCallSound: Uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
         val hasVideo = data.getBoolean(EXTRA_CALLKEEP_HAS_VIDEO, false)
-        val notificationIcon = data.getString(EXTRA_CALLKEEP_NOTIFICATION_ICON, "")   
+        val notificationIcon = data.getString(EXTRA_CALLKEEP_NOTIFICATION_ICON, "")
+        notificationBuilder = NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID_MISSED)
+        notificationBuilder.setChannelId(NOTIFICATION_CHANNEL_ID_MISSED)   
         if(notificationIcon.isEmpty()){
         var smallIcon = context.applicationInfo.icon
             if (hasVideo) {
@@ -199,8 +201,6 @@ class CallKeepNotificationManager(private val context: Context) {
             val icon = IconCompat.createWithResource(context, identifier)
             notificationBuilder.setSmallIcon(icon)
         }
-        notificationBuilder = NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID_MISSED)
-        notificationBuilder.setChannelId(NOTIFICATION_CHANNEL_ID_MISSED)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                 notificationBuilder.setCategory(Notification.CATEGORY_MISSED_CALL)
