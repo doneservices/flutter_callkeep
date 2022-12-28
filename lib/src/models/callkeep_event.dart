@@ -1,7 +1,30 @@
 import 'package:flutter_callkeep/flutter_callkeep.dart';
 
+/// The base class for a [CallKeepEvent]
+///
+/// Any [CallKeepEvent] will hold its own [type]
 abstract class CallKeepEvent {
+  /// The type of the current event
   final CallKeepEventType type;
+
+  /// The data of the current event, it may require casting depending on event type
+  ///
+  /// The data for all CallKeep events is of [CallKeepCallData] type,
+  /// only the CallKit related events have different types of data, namely:
+  ///
+  /// Data type => Event type
+  ///
+  /// [CallKeepHoldEvent] => [CallKeepEventType.holdToggled]
+  ///
+  /// [CallKeepMuteEvent] => [CallKeepEventType.muteToggled]
+  ///
+  /// [CallKeepDmtfEvent] => [CallKeepEventType.dmtfToggled]
+  ///
+  /// [CallKeepCallGroupEvent] => [CallKeepEventType.callGroupToggled]
+  ///
+  /// [CallKeepAudioSessionEvent] => [CallKeepEventType.audioSessionToggled]
+  ///
+  /// [CallKeepVoipTokenEvent] => [CallKeepEventType.devicePushTokenUpdated]
   final CallKeepBaseData data;
 
   factory CallKeepEvent.fromMap(Map data) {
@@ -39,13 +62,21 @@ abstract class CallKeepEvent {
   CallKeepEvent({required this.type, required this.data});
 }
 
+/// The default [CallKeepEvent]
+///
+/// It holds a certain call's data
 class CallKeepCallEvent extends CallKeepEvent {
-  final CallKeepEventType type;
   final CallKeepCallData data;
 
-  CallKeepCallEvent({required this.type, required this.data}) : super(type: type, data: data);
+  CallKeepCallEvent({
+    required CallKeepEventType type,
+    required this.data,
+  }) : super(type: type, data: data);
 }
 
+/// The event for iOS audio session activation
+///
+/// Useful for starting a call on iOS, as we probably need to wait for audio session activation
 class CallKeepAudioSessionEvent extends CallKeepEvent {
   final AudioSessionToggleData data;
 
@@ -55,6 +86,7 @@ class CallKeepAudioSessionEvent extends CallKeepEvent {
   }) : super(type: type, data: data);
 }
 
+/// The event for CallKit mute toggling
 class CallKeepMuteEvent extends CallKeepEvent {
   final MuteToggleData data;
 
@@ -64,6 +96,7 @@ class CallKeepMuteEvent extends CallKeepEvent {
   }) : super(type: type, data: data);
 }
 
+/// The event for CallKit hold toggling
 class CallKeepHoldEvent extends CallKeepEvent {
   final HoldToggleData data;
 
@@ -73,6 +106,7 @@ class CallKeepHoldEvent extends CallKeepEvent {
   }) : super(type: type, data: data);
 }
 
+/// The event for CallKit call group toggling
 class CallKeepCallGroupEvent extends CallKeepEvent {
   final CallGroupToggleData data;
 
@@ -82,6 +116,7 @@ class CallKeepCallGroupEvent extends CallKeepEvent {
   }) : super(type: type, data: data);
 }
 
+/// The event for CallKit DMTF toggling
 class CallKeepDmtfEvent extends CallKeepEvent {
   final DmtfToggleData data;
 
@@ -91,6 +126,7 @@ class CallKeepDmtfEvent extends CallKeepEvent {
   }) : super(type: type, data: data);
 }
 
+/// The event for CallKit device VoIP push token
 class CallKeepVoipTokenEvent extends CallKeepEvent {
   final VoipTokenData data;
 

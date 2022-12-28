@@ -32,11 +32,11 @@ import flutter_callkeep
         guard let isVideo = userActivity.isVideo else {
             return false
         }
-        let nameCaller = handleObj.getDecryptHandle()["nameCaller"] as? String ?? ""
+        let callerName = handleObj.getDecryptHandle()["callerName"] as? String ?? ""
         let handle = handleObj.getDecryptHandle()["handle"] as? String ?? ""
-        let data = flutter_callkeep.Data(id: UUID().uuidString, nameCaller: nameCaller, handle: handle, type: isVideo ? 1 : 0)
+        let data = flutter_callkeep.Data(id: UUID().uuidString, callerName: callerName, handle: handle, hasVideo: isVideo)
         //set more data...
-        data.nameCaller = "Johnny"
+        data.callerName = "Johnny"
         SwiftCallKeepPlugin.sharedInstance?.startCall(data, fromPushKit: true)
         
         return super.application(application, continue: userActivity, restorationHandler: restorationHandler)
@@ -62,11 +62,11 @@ import flutter_callkeep
         guard type == .voIP else { return }
         
         let id = payload.dictionaryPayload["id"] as? String ?? ""
-        let nameCaller = payload.dictionaryPayload["nameCaller"] as? String ?? ""
+        let callerName = payload.dictionaryPayload["callerName"] as? String ?? ""
         let handle = payload.dictionaryPayload["handle"] as? String ?? ""
         let isVideo = payload.dictionaryPayload["isVideo"] as? Bool ?? false
         
-        let data = flutter_callkeep.Data(id: id, nameCaller: nameCaller, handle: handle, type: isVideo ? 1 : 0)
+        let data = flutter_callkeep.Data(id: id, callerName: callerName, handle: handle, hasVideo: isVideo)
         //set more data
         data.extra = ["user": "abc@123", "platform": "ios"]
         //data.iconName = ...

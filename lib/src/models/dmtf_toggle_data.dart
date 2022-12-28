@@ -1,5 +1,6 @@
 import 'package:flutter_callkeep/flutter_callkeep.dart';
 
+/// CallKit DMTF toggling information from CallKit
 class DmtfToggleData extends CallKeepBaseData {
   final String digits;
   final DmtfActionType actionType;

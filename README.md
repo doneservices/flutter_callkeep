@@ -2,50 +2,198 @@
 
 Showing incoming call notification/screen using iOS CallKit and Android Custom UI for Flutter
 
-## Getting Started
-
-This project is a starting point for a Flutter
-[plug-in package](https://flutter.dev/developing-packages/),
-a specialized package that includes platform-specific implementation code for
-Android and/or iOS.
-
-For help getting started with Flutter, view our 
-[online documentation](https://flutter.dev/docs), which offers tutorials, 
-samples, guidance on mobile development, and a full API reference.
-
-## Device Permission
+## Native setup
 
 flutter_callkeep requires the following permissions.
 
 ### Android
 
-If you want to use the function `displayIncomingCall`, please add the following permissions and service to the `AndroidManifest.xml`.
+No extra setup is needed
 
-```xml
-..
-<uses-permission android:name="android.permission.BIND_TELECOM_CONNECTION_SERVICE" />
-<uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-<uses-permission android:name="android.permission.READ_PHONE_STATE" />
-<uses-permission android:name="android.permission.CALL_PHONE" />
-<uses-permission android:name="android.permission.RECORD_AUDIO" />
-..
+
+### iOS
+in `Info.plist`
+
 ```
-```xml
-<application>
-    ..
-    <service android:name="io.wazo.callkeep.VoiceConnectionService"
-        android:label="Wazo"
-        android:permission="android.permission.BIND_TELECOM_CONNECTION_SERVICE">
-        <intent-filter>
-            <action android:name="android.telecom.ConnectionService" />
-        </intent-filter>
-    </service>
-    ..
-</application>
+<key>UIBackgroundModes</key>
+<array>
+    <string>processing</string>
+    <string>remote-notification</string>
+    <string>voip</string>
+</array>
 ```
 
-if you want to use the function `displayCustomIncomingCall`, please add the following permission to the `AndroidManifest.xml`.
+Then you need to update `AppDelegate.swift` to follow the example for handling PushKit as push handling must be done through native iOS code due to [iOS 13 PushKit VoIP restrictions](https://developer.apple.com/documentation/pushkit/pkpushregistrydelegate/2875784-pushregistry).
 
-```xml
-<uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
+```swift
+import UIKit
+import PushKit
+import Flutter
+import flutter_callkeep
+
+@UIApplicationMain
+@objc class AppDelegate: FlutterAppDelegate, PKPushRegistryDelegate {
+    override func application(
+        _ application: UIApplication,
+        didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
+    ) -> Bool {
+        GeneratedPluginRegistrant.register(with: self)
+        
+        //Setup VOIP
+        let mainQueue = DispatchQueue.main
+        let voipRegistry: PKPushRegistry = PKPushRegistry(queue: mainQueue)
+        voipRegistry.delegate = self
+        voipRegistry.desiredPushTypes = [PKPushType.voIP]
+        
+        return super.application(application, didFinishLaunchingWithOptions: launchOptions)
+    }
+    
+    // Call back from Recent history
+    override func application(_ application: UIApplication,
+                              continue userActivity: NSUserActivity,
+                              restorationHandler: @escaping ([UIUserActivityRestoring]?) -> Void) -> Bool {
+        
+        guard let handleObj = userActivity.handle else {
+            return false
+        }
+        
+        guard let isVideo = userActivity.isVideo else {
+            return false
+        }
+        let callerName = handleObj.getDecryptHandle()["callerName"] as? String ?? ""
+        let handle = handleObj.getDecryptHandle()["handle"] as? String ?? ""
+        let data = flutter_callkeep.Data(id: UUID().uuidString, callerName: callerName, handle: handle, hasVideo: isVideo)
+        //set more data...
+        data.callerName = "Johnny"
+        SwiftCallKeepPlugin.sharedInstance?.startCall(data, fromPushKit: true)
+        
+        return super.application(application, continue: userActivity, restorationHandler: restorationHandler)
+    }
+    
+    // Handle updated push credentials
+    func pushRegistry(_ registry: PKPushRegistry, didUpdate credentials: PKPushCredentials, for type: PKPushType) {
+        print(credentials.token)
+        let deviceToken = credentials.token.map { String(format: "%02x", $0) }.joined()
+        print(deviceToken)
+        //Save deviceToken to your server
+        SwiftCallKeepPlugin.sharedInstance?.setDevicePushTokenVoIP(deviceToken)
+    }
+    
+    func pushRegistry(_ registry: PKPushRegistry, didInvalidatePushTokenFor type: PKPushType) {
+        print("didInvalidatePushTokenFor")
+        SwiftCallKeepPlugin.sharedInstance?.setDevicePushTokenVoIP("")
+    }
+    
+    // Handle incoming pushes
+    func pushRegistry(_ registry: PKPushRegistry, didReceiveIncomingPushWith payload: PKPushPayload, for type: PKPushType, completion: @escaping () -> Void) {
+        print("didReceiveIncomingPushWith")
+        guard type == .voIP else { return }
+        
+        let id = payload.dictionaryPayload["id"] as? String ?? ""
+        let callerName = payload.dictionaryPayload["callerName"] as? String ?? ""
+        let handle = payload.dictionaryPayload["handle"] as? String ?? ""
+        let isVideo = payload.dictionaryPayload["isVideo"] as? Bool ?? false
+        
+        let data = flutter_callkeep.Data(id: id, callerName: callerName, handle: handle, hasVideo: isVideo)
+        //set more data
+        data.extra = ["user": "abc@123", "platform": "ios"]
+        //data.iconName = ...
+        //data.appName = ...
+        //data.....
+        SwiftCallKeepPlugin.sharedInstance?.displayIncomingCall(data, fromPushKit: true)
+    }   
+}
+```
+
+## Usage
+
+### Setup: 
+
+You need to have base `CallKeep` config setup to reduce code duplication and make it easier to display incoming calls: 
+
+```dart
+ final callKeepBaseConfig = CallKeepBaseConfig(
+      appName: 'Done',
+      androidConfig: CallKeepAndroidConfig(
+        logo: 'logo',
+        notificationIcon: 'notification_icon',
+        ringtoneFileName: 'ringtone.mp3',
+        accentColor: '#34C7C2',
+      ),
+      iosConfig: CallKeepIosConfig(
+        iconName: 'Icon',
+        maximumCallGroups: 1,
+      ),
+    );
+```
+
+### Display incoming call:
+
+```dart
+// Config and uuid are the only required parameters
+final config = CallKeepIncomingConfig.fromBaseConfig(
+    config: callKeepBaseConfig,
+    uuid: uuid,
+    contentTitle: 'Incoming call from Done',
+    hasVideo: hasVideo,
+    handle: handle,
+    callerName: incomingCallUsername,
+    extra: callData,
+);
+await CallKeep.instance.displayIncomingCall(config);
+```
+
+### Show missed call notification (Android only):
+
+```dart
+// config and uuid are the only required parameters
+final config = CallKeepIncomingConfig.fromBaseConfig(
+    config: callKeepBaseConfig,
+    uuid: uuid,
+    contentTitle: 'Incoming call from Done',
+    hasVideo: hasVideo,
+    handle: handle,
+    callerName: incomingCallUsername,
+    extra: callData,
+);
+await CallKeep.instance.showMissCallNotification(config);
+```
+
+### Start an outgoing call:
+
+```dart
+// config and uuid are the only required parameters
+final config = CallKeepOutgoingConfig.fromBaseConfig(
+    config: DoneCallsConfig.instance.callKeepBaseConfig,
+    uuid: uuid,
+    handle: handle,
+    hasVideo: hasVideo ?? false,
+);
+CallKeep.instance.startCall(config);
+```
+
+### Handling events:
+
+```dart
+CallKeep.instance.onEvent.listen((event) async {
+    // TODO: Implement other events
+    if (event == null) return;
+    switch (event.type) {
+        case CallKeepEventType.callAccept:
+        final data = event.data as CallKeepCallData;
+        print('call answered: ${data.toMap()}');
+        NavigationService.instance
+            .pushNamedIfNotCurrent(AppRoute.callingPage, args: data.toMap());
+        if (callback != null) callback.call(event);
+        break;
+        case CallKeepEventType.callDecline:
+        final data = event.data as CallKeepCallData;
+        print('call declined: ${data.toMap()}');
+        await requestHttp("ACTION_CALL_DECLINE_FROM_DART");
+        if (callback != null) callback.call(data);
+        break;
+        default:
+        break;
+    }
+});
 ```

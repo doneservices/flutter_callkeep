@@ -1,5 +1,8 @@
 import 'package:flutter_callkeep/flutter_callkeep.dart';
 
+/// The device push token data for VoIP
+///
+/// [token] is always an empty String on Android
 class VoipTokenData extends CallKeepBaseData {
   final String token;
 

@@ -1,5 +1,6 @@
 import 'package:flutter_callkeep/flutter_callkeep.dart';
 
+/// CallKit mute toggling information from CallKit
 class MuteToggleData extends CallKeepBaseData {
   final bool isMuted;
 

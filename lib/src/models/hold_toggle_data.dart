@@ -1,5 +1,6 @@
 import 'package:flutter_callkeep/flutter_callkeep.dart';
 
+/// CallKit hold toggling information from CallKit
 class HoldToggleData extends CallKeepBaseData {
   final bool isOnHold;
 

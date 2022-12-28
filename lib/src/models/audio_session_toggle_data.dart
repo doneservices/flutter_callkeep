@@ -1,5 +1,8 @@
 import 'package:flutter_callkeep/flutter_callkeep.dart';
 
+/// The data for audio session toggle event from CallKeep
+///
+/// It may hold data for [answerCall] or [outgoingCall]
 class AudioSessionToggleData extends CallKeepBaseData {
   final bool isActivated;
   final CallKeepCallData? answerCall;

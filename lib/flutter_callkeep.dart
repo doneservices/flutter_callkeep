@@ -8,6 +8,7 @@ export 'package:flutter_callkeep/src/models/models.dart';
 /// Instance to use library functions.
 /// * displayIncomingCall(CallKeepIncomingConfig)
 /// * startCall(CallKeepOutgoingConfig)
+/// * showMissCallNotification(CallKeepIncomingConfig)
 /// * endCall(String Uuid)
 /// * endAllCalls()
 ///
@@ -69,7 +70,7 @@ class CallKeep {
   }
 
   /// Show Miss Call Notification.
-  /// Only Android
+  /// On Android only
   Future<void> showMissCallNotification(CallKeepIncomingConfig config) async {
     await _channel.invokeMethod("showMissCallNotification", config.toMap());
   }
@@ -95,7 +96,9 @@ class CallKeep {
 
   /// Get active calls.
   /// On iOS: return active calls from Callkit.
-  /// On Android: only return last call
+  /// On Android: return active calls from SharedPrefs
+  ///
+  /// Helpful when starting the app from terminated state to retrieve information about latest calls
   Future<List<CallKeepCallData>> activeCalls() async {
     final activeCallsRaw = await _channel.invokeMethod<List>("activeCalls");
     if (activeCallsRaw == null) return [];
@@ -107,7 +110,7 @@ class CallKeep {
 
   /// Get device push token VoIP.
   /// On iOS: return deviceToken for VoIP.
-  /// On Android: return Empty
+  /// On Android: returns empty String
   Future<String> getDevicePushTokenVoIP() async {
     return (await _channel.invokeMethod<String>("getDevicePushTokenVoIP")) ?? '';
   }
@@ -124,6 +127,7 @@ class CallKeep {
     }
   }
 
+  /// Closes the subscription for [onEvent]
   void close() {
     _eventChannelSubscription.cancel();
   }

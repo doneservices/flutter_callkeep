@@ -1,5 +1,6 @@
 import 'package:flutter_callkeep/flutter_callkeep.dart';
 
+/// The data for toggling call group event from CallKeep
 class CallGroupToggleData extends CallKeepBaseData {
   final String callUuidToGroupWith;
 
