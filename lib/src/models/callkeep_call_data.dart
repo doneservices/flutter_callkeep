@@ -60,6 +60,6 @@ class CallKeepCallData extends CallKeepBaseData {
 
   @override
   String toString() {
-    return 'CallKeepCallData(callerName: $callerName, handle: $handle, hasVideo: $hasVideo, duration: $duration, extra: $extra, isAccepted: $isAccepted)';
+    return 'CallKeepCallData(uuid: $uuid, callerName: $callerName, handle: $handle, hasVideo: $hasVideo, duration: $duration, extra: $extra, isAccepted: $isAccepted)';
   }
 }
