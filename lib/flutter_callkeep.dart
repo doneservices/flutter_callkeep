@@ -101,7 +101,6 @@ class CallKeep {
   /// Helpful when starting the app from terminated state to retrieve information about latest calls
   Future<List<CallKeepCallData>> activeCalls() async {
     final activeCallsRaw = await _channel.invokeMethod<List>("activeCalls");
-    print('active calls raw: $activeCallsRaw');
     if (activeCallsRaw == null) return [];
     return activeCallsRaw
         .map<Map<String, dynamic>>((e) => Map<String, dynamic>.from(e))
