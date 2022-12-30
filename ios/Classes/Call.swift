@@ -50,7 +50,7 @@ public class Call: NSObject {
     
     var isMuted = false{
         didSet{
-            
+            stateDidChange?()           
         }
     }
     
