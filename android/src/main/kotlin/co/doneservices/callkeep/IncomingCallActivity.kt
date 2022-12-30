@@ -103,7 +103,7 @@ class IncomingCallActivity : Activity() {
             window.addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED)
             window.addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD)
         }
-        transparentStatusAndNavigation()
+        setTransparentStatusAndNavigation()
         setContentView(R.layout.activity_call_incoming)
         initView()
         updateViewWithIncomingIntentData(intent)
@@ -123,7 +123,7 @@ class IncomingCallActivity : Activity() {
         wakeLock.acquire(duration)
     }
 
-    private fun transparentStatusAndNavigation() {
+    private fun setTransparentStatusAndNavigation() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT && Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
             setWindowFlag(
                     WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS
