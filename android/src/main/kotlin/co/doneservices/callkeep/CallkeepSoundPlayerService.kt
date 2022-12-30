@@ -102,7 +102,7 @@ class CallKeepSoundPlayerService : Service() {
             mediaPlayer?.setAudioStreamType(AudioManager.STREAM_RING)
         }
         val assetFileDescriptor = applicationContext.getContentResolver().openAssetFileDescriptor(uri, "r")
-        if (assetFileDescriptor != null) {
+        if (assetFileDescriptor != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             mediaPlayer?.setDataSource(assetFileDescriptor)
         } else {
             mediaPlayer?.setDataSource(applicationContext, uri)
@@ -112,40 +112,21 @@ class CallKeepSoundPlayerService : Service() {
         mediaPlayer?.start()
     }
 
-    private fun getRingtoneUri(fileName: String) = try {
-        if (TextUtils.isEmpty(fileName)) {
-            RingtoneManager.getActualDefaultRingtoneUri(
-                    this@CallKeepSoundPlayerService,
-                    RingtoneManager.TYPE_RINGTONE
-            )
-        }
-        val resId = resources.getIdentifier(fileName, "raw", packageName)
-        if (resId != 0) {
-            Uri.parse("android.resource://${packageName}/$resId")
-        } else {
-            if (fileName.equals("system_ringtone_default", true)) {
-                RingtoneManager.getActualDefaultRingtoneUri(
-                        this@CallKeepSoundPlayerService,
-                        RingtoneManager.TYPE_RINGTONE
-                )
-            } else {
-                RingtoneManager.getActualDefaultRingtoneUri(
-                        this@CallKeepSoundPlayerService,
-                        RingtoneManager.TYPE_RINGTONE
-                )
+    private fun getRingtoneUri(fileName: String): Uri {
+        val defaultRingtoneUri = RingtoneManager.getActualDefaultRingtoneUri(this@CallKeepSoundPlayerService, RingtoneManager.TYPE_RINGTONE)
+        try {
+            if (TextUtils.isEmpty(fileName)) {
+                return defaultRingtoneUri
             }
-        }
-    } catch (e: Exception) {
-        if (fileName.equals("system_ringtone_default", true)) {
-            RingtoneManager.getActualDefaultRingtoneUri(
-                    this@CallKeepSoundPlayerService,
-                    RingtoneManager.TYPE_RINGTONE
-            )
-        } else {
-            RingtoneManager.getActualDefaultRingtoneUri(
-                    this@CallKeepSoundPlayerService,
-                    RingtoneManager.TYPE_RINGTONE
-            )
+            val resId = resources.getIdentifier(fileName, "raw", packageName)
+            if (resId != 0) {
+                return Uri.parse("android.resource://${packageName}/$resId")
+            } else {
+                return defaultRingtoneUri
+
+            }
+        } catch (e: Exception) {
+            return defaultRingtoneUri
         }
     }
 }
