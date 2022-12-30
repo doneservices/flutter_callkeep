@@ -106,7 +106,7 @@ class IncomingCallActivity : Activity() {
         transparentStatusAndNavigation()
         setContentView(R.layout.activity_call_incoming)
         initView()
-        incomingData(intent)
+        updateViewWithIncomingIntentData(intent)
         registerReceiver(
                 endedCallKeepBroadcastReceiver,
                 IntentFilter(ACTION_ENDED_CALL_INCOMING)
@@ -157,7 +157,7 @@ class IncomingCallActivity : Activity() {
     }
 
 
-    private fun incomingData(intent: Intent) {
+    private fun updateViewWithIncomingIntentData(intent: Intent) {
         val data = intent.extras?.getBundle(EXTRA_CALLKEEP_INCOMING_DATA)
         if (data == null) finish()
 
