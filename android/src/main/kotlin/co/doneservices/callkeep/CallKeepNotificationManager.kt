@@ -92,8 +92,8 @@ class CallKeepNotificationManager(private val context: Context) {
 
         notificationId = data.getString(EXTRA_CALLKEEP_ID, "callkeep").hashCode()
         createNotificationChanel(
-            data.getString(EXTRA_CALLKEEP_INCOMING_CALL_NOTIFICATION_CHANNEL_NAME, "Incoming Calls"),
-            data.getString(EXTRA_CALLKEEP_MISSED_CALL_NOTIFICATION_CHANNEL_NAME, "Missed Calls"),
+                data.getString(EXTRA_CALLKEEP_INCOMING_CALL_NOTIFICATION_CHANNEL_NAME, "Incoming Calls"),
+                data.getString(EXTRA_CALLKEEP_MISSED_CALL_NOTIFICATION_CHANNEL_NAME, "Missed Calls"),
         )
 
         notificationBuilder = NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID_INCOMING)
@@ -116,9 +116,9 @@ class CallKeepNotificationManager(private val context: Context) {
         notificationBuilder.setContentIntent(getActivityPendingIntent(notificationId, data))
         notificationBuilder.setDeleteIntent(getTimeOutPendingIntent(notificationId, data))
         val hasVideo = data.getBoolean(EXTRA_CALLKEEP_HAS_VIDEO, false)
-        val notificationIcon = data.getString(EXTRA_CALLKEEP_NOTIFICATION_ICON, "")   
-        if(notificationIcon.isEmpty()){
-        var smallIcon = context.applicationInfo.icon
+        val notificationIcon = data.getString(EXTRA_CALLKEEP_NOTIFICATION_ICON, "")
+        if (notificationIcon.isEmpty()) {
+            var smallIcon = context.applicationInfo.icon
             if (hasVideo) {
                 smallIcon = R.drawable.ic_video
             } else {
@@ -140,7 +140,7 @@ class CallKeepNotificationManager(private val context: Context) {
         }
         notificationBuilder.setChannelId(NOTIFICATION_CHANNEL_ID_INCOMING)
         notificationBuilder.priority = NotificationCompat.PRIORITY_MAX
-      
+
         val avatarUrl = data.getString(EXTRA_CALLKEEP_AVATAR, "")
         if (avatarUrl != null && avatarUrl.isNotEmpty()) {
             val headers =
@@ -149,7 +149,7 @@ class CallKeepNotificationManager(private val context: Context) {
                     .into(targetLoadAvatarDefault)
         }
         val contentTitle = data.getString(EXTRA_CALLKEEP_CONTENT_TITLE, "")
-        if(contentTitle?.isNotEmpty() == true){
+        if (contentTitle?.isNotEmpty() == true) {
             notificationBuilder.setContentTitle(contentTitle)
         } else {
             notificationBuilder.setContentTitle(data.getString(EXTRA_CALLKEEP_CALLER_NAME, ""))
@@ -169,7 +169,7 @@ class CallKeepNotificationManager(private val context: Context) {
                 getAcceptPendingIntent(notificationId, data)
         ).build()
         notificationBuilder.addAction(acceptAction)
-        
+
         val notification = notificationBuilder.build()
         notification.flags = Notification.FLAG_INSISTENT
         getNotificationManager().notify(notificationId, notification)
@@ -178,16 +178,16 @@ class CallKeepNotificationManager(private val context: Context) {
     fun showMissCallNotification(data: Bundle) {
         notificationId = data.getString(EXTRA_CALLKEEP_ID, "callkeep").hashCode() + 1
         createNotificationChanel(
-            data.getString(EXTRA_CALLKEEP_INCOMING_CALL_NOTIFICATION_CHANNEL_NAME, "Incoming Calls"),
-            data.getString(EXTRA_CALLKEEP_MISSED_CALL_NOTIFICATION_CHANNEL_NAME, "Missed Calls"),
+                data.getString(EXTRA_CALLKEEP_INCOMING_CALL_NOTIFICATION_CHANNEL_NAME, "Incoming Calls"),
+                data.getString(EXTRA_CALLKEEP_MISSED_CALL_NOTIFICATION_CHANNEL_NAME, "Missed Calls"),
         )
         val missedCallSound: Uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
         val hasVideo = data.getBoolean(EXTRA_CALLKEEP_HAS_VIDEO, false)
         val notificationIcon = data.getString(EXTRA_CALLKEEP_NOTIFICATION_ICON, "")
         notificationBuilder = NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID_MISSED)
-        notificationBuilder.setChannelId(NOTIFICATION_CHANNEL_ID_MISSED)   
-        if(notificationIcon.isEmpty()){
-        var smallIcon = context.applicationInfo.icon
+        notificationBuilder.setChannelId(NOTIFICATION_CHANNEL_ID_MISSED)
+        if (notificationIcon.isEmpty()) {
+            var smallIcon = context.applicationInfo.icon
             if (hasVideo) {
                 smallIcon = R.drawable.ic_video
             } else {
@@ -208,9 +208,9 @@ class CallKeepNotificationManager(private val context: Context) {
         }
         val missedCallText = data.getString(EXTRA_CALLKEEP_TEXT_MISSED_CALL, "")
         notificationBuilder.setSubText(if (TextUtils.isEmpty(missedCallText)) context.getString(R.string.text_missed_call) else missedCallText)
-    
+
         val contentTitle = data.getString(EXTRA_CALLKEEP_CONTENT_TITLE, "")
-        if(contentTitle?.isNotEmpty() == true){
+        if (contentTitle?.isNotEmpty() == true) {
             notificationBuilder.setContentTitle(contentTitle)
         } else {
             notificationBuilder.setContentTitle(data.getString(EXTRA_CALLKEEP_CALLER_NAME, ""))
@@ -234,7 +234,7 @@ class CallKeepNotificationManager(private val context: Context) {
             ).build()
             notificationBuilder.addAction(callbackAction)
         }
-        
+
         notificationBuilder.priority = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             NotificationManager.IMPORTANCE_HIGH
         } else {
@@ -288,8 +288,8 @@ class CallKeepNotificationManager(private val context: Context) {
     }
 
     private fun createNotificationChanel(
-        incomingCallChannelName: String,
-        missedCallChannelName: String,
+            incomingCallChannelName: String,
+            missedCallChannelName: String,
     ) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             var channelCall = getNotificationManager().getNotificationChannel(NOTIFICATION_CHANNEL_ID_INCOMING)
@@ -397,7 +397,7 @@ class CallKeepNotificationManager(private val context: Context) {
     }
 
     private fun getActivityPendingIntent(id: Int, data: Bundle): PendingIntent {
-        val intent = IncomingCallActivity.getIntent(context,data)
+        val intent = IncomingCallActivity.getIntent(context, data)
         return PendingIntent.getActivity(context, id, intent, getFlagPendingIntent())
     }
 
