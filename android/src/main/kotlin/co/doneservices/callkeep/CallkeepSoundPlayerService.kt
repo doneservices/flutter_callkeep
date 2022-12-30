@@ -78,18 +78,18 @@ class CallKeepSoundPlayerService : Service() {
             )
         }
         try {
-            mediaPlayer(uri!!)
+            startLoopingSound(uri!!)
         } catch (e: Exception) {
             try {
                 uri = getRingtoneUri("ringtone_default")
-                mediaPlayer(uri!!)
+                startLoopingSound(uri!!)
             } catch (e2: Exception) {
                 e2.printStackTrace()
             }
         }
     }
 
-    private fun mediaPlayer(uri: Uri) {
+    private fun startLoopingSound(uri: Uri) {
         mediaPlayer = MediaPlayer()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             val attribution = AudioAttributes.Builder()
