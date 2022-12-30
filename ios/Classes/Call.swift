@@ -112,11 +112,6 @@ public class Call: NSObject {
         hasEnded = true
     }
     
-    func startAudio() {
-        
-    }
-    
-    
 }
 
 @objc public class Data: NSObject {
