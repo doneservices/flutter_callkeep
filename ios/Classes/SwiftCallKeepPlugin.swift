@@ -196,27 +196,30 @@ public class SwiftCallKeepPlugin: NSObject, FlutterPlugin, CXProviderDelegate {
     }
     
     public func saveEndCall(_ uuid: String, _ reason: Int) {
+        var endReason : CXCallEndedReason?
         switch reason {
         case 1:
-            self.sharedProvider?.reportCall(with: UUID(uuidString: uuid)!, endedAt: Date(), reason: CXCallEndedReason.failed)
+            endReason = CXCallEndedReason.failed
             break
         case 2, 6:
-            self.sharedProvider?.reportCall(with: UUID(uuidString: uuid)!, endedAt: Date(), reason: CXCallEndedReason.remoteEnded)
+            endReason = CXCallEndedReason.remoteEnded
             break
         case 3:
-            self.sharedProvider?.reportCall(with: UUID(uuidString: uuid)!, endedAt: Date(), reason: CXCallEndedReason.unanswered)
+            endReason = CXCallEndedReason.unanswered
             break
         case 4:
-            self.sharedProvider?.reportCall(with: UUID(uuidString: uuid)!, endedAt: Date(), reason: CXCallEndedReason.answeredElsewhere)
+            endReason = CXCallEndedReason.answeredElsewhere
             break
         case 5:
-            self.sharedProvider?.reportCall(with: UUID(uuidString: uuid)!, endedAt: Date(), reason: CXCallEndedReason.declinedElsewhere)
+            endReason = CXCallEndedReason.declinedElsewhere
             break
         default:
             break
         }
+        if(endReason != nil){
+            self.sharedProvider?.reportCall(with: UUID(uuidString: uuid)!, endedAt: Date(), reason: endReason!)
+        }
     }
-    
     
     func endCallNotExist(_ data: Data) {
         DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(data.duration)) {
