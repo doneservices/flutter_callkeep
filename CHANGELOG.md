@@ -1,4 +1,4 @@
-## 1.0.0
+## 0.3.0
 
 - Rework API based on `flutter_callkit_incoming`'s API, add iOS implementation and fix bugs (BREAKING CHANGE)
 

@@ -36,7 +36,7 @@ PODS:
     - GoogleUtilities/UserDefaults (~> 7.7)
     - nanopb (~> 2.30908.0)
   - Flutter (1.0.0)
-  - flutter_callkeep (1.0.0):
+  - flutter_callkeep (0.3.0):
     - CryptoSwift
     - Flutter
   - GoogleDataTransport (9.1.4):
