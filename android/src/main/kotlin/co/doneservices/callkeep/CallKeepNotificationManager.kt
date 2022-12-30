@@ -117,7 +117,7 @@ class CallKeepNotificationManager(private val context: Context) {
         notificationBuilder.setDeleteIntent(getTimeOutPendingIntent(notificationId, data))
         val hasVideo = data.getBoolean(EXTRA_CALLKEEP_HAS_VIDEO, false)
         val notificationIcon = data.getString(EXTRA_CALLKEEP_NOTIFICATION_ICON, "")
-        if (notificationIcon.isEmpty()) {
+        if (notificationIcon.isEmpty() || Build.VERSION.SDK_INT < Build.VERSION_CODES.M ) {
             var smallIcon = context.applicationInfo.icon
             if (hasVideo) {
                 smallIcon = R.drawable.ic_video
@@ -138,8 +138,6 @@ class CallKeepNotificationManager(private val context: Context) {
             notificationBuilder.color = Color.parseColor(accentColor)
         } catch (error: Exception) {
         }
-        notificationBuilder.setChannelId(NOTIFICATION_CHANNEL_ID_INCOMING)
-        notificationBuilder.priority = NotificationCompat.PRIORITY_MAX
 
         val avatarUrl = data.getString(EXTRA_CALLKEEP_AVATAR, "")
         if (avatarUrl != null && avatarUrl.isNotEmpty()) {
@@ -186,7 +184,7 @@ class CallKeepNotificationManager(private val context: Context) {
         val notificationIcon = data.getString(EXTRA_CALLKEEP_NOTIFICATION_ICON, "")
         notificationBuilder = NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID_MISSED)
         notificationBuilder.setChannelId(NOTIFICATION_CHANNEL_ID_MISSED)
-        if (notificationIcon.isEmpty()) {
+        if (notificationIcon.isEmpty() || Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
             var smallIcon = context.applicationInfo.icon
             if (hasVideo) {
                 smallIcon = R.drawable.ic_video
