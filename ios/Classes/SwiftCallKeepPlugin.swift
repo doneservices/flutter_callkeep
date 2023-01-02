@@ -68,7 +68,7 @@ public class SwiftCallKeepPlugin: NSObject, FlutterPlugin, CXProviderDelegate {
         switch call.method {
         case "displayIncomingCall":
             guard let args = call.arguments else {
-                result("OK")
+                result(FlutterError.nilArgument)
                 return
             }
             if let getArgs = args as? [String: Any] {
@@ -82,7 +82,7 @@ public class SwiftCallKeepPlugin: NSObject, FlutterPlugin, CXProviderDelegate {
             break
         case "startCall":
             guard let args = call.arguments else {
-                result("OK")
+                result(FlutterError.nilArgument)
                 return
             }
             if let getArgs = args as? [String: Any] {
@@ -93,7 +93,7 @@ public class SwiftCallKeepPlugin: NSObject, FlutterPlugin, CXProviderDelegate {
             break
         case "endCall":
             guard let args = call.arguments else {
-                result("OK")
+                result(FlutterError.nilArgument)
                 return
             }
             if(self.isFromPushKit){
@@ -516,4 +516,11 @@ class EventCallbackHandler: FlutterStreamHandler {
         self.eventSink = nil
         return nil
     }
+}
+
+extension FlutterError {
+  static let nilArgument = FlutterError(
+    code: "argument.nil",
+    message: "Expected arguments when invoking channel method, but it is nil.", details: nil
+  )
 }
