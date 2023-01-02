@@ -61,7 +61,9 @@ class CallKeepIncomingConfig extends CallKeepCallData {
       callerName: callerName,
       avatar: avatar,
       appName: config.appName,
-      contentTitle: contentTitle ?? config.contentTitle?.call(callerName ?? config.appName) ?? "",
+      contentTitle: contentTitle ??
+          config.contentTitle?.call(callerName ?? config.appName) ??
+          "",
       acceptText: config.acceptText,
       declineText: config.declineText,
       missedCallText: config.missedCallText,

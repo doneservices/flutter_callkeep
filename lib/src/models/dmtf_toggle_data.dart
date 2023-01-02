@@ -20,4 +20,5 @@ class DmtfToggleData extends CallKeepBaseData {
   }
 }
 
+/// The action type of [DmtfToggleData]
 enum DmtfActionType { singleTone, softPause, hardPause }

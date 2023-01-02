@@ -19,10 +19,12 @@ class AudioSessionToggleData extends CallKeepBaseData {
     return AudioSessionToggleData(
       callUuid: map['id'] ?? '',
       answerCall: map['answerCall'] != null
-          ? CallKeepCallData.fromMap(Map<String, dynamic>.from(map['answerCall']))
+          ? CallKeepCallData.fromMap(
+              Map<String, dynamic>.from(map['answerCall']))
           : null,
       outgoingCall: map['outgoingCall'] != null
-          ? CallKeepCallData.fromMap(Map<String, dynamic>.from(map['outgoingCall']))
+          ? CallKeepCallData.fromMap(
+              Map<String, dynamic>.from(map['outgoingCall']))
           : null,
       isActivated: map['isActivate'] ?? false,
     );

@@ -40,7 +40,8 @@ abstract class CallKeepEvent {
         case CallKeepEventType.callEnded:
         case CallKeepEventType.callTimedOut:
         case CallKeepEventType.missedCallback:
-          return CallKeepCallEvent(type: event, data: CallKeepCallData.fromMap(body));
+          return CallKeepCallEvent(
+              type: event, data: CallKeepCallData.fromMap(body));
         case CallKeepEventType.holdToggled:
           return CallKeepHoldEvent(data: HoldToggleData.fromMap(body));
         case CallKeepEventType.muteToggled:
@@ -48,9 +49,11 @@ abstract class CallKeepEvent {
         case CallKeepEventType.dmtfToggled:
           return CallKeepDmtfEvent(data: DmtfToggleData.fromMap(body));
         case CallKeepEventType.callGroupToggled:
-          return CallKeepCallGroupEvent(data: CallGroupToggleData.fromMap(body));
+          return CallKeepCallGroupEvent(
+              data: CallGroupToggleData.fromMap(body));
         case CallKeepEventType.audioSessionToggled:
-          return CallKeepAudioSessionEvent(data: AudioSessionToggleData.fromMap(body));
+          return CallKeepAudioSessionEvent(
+              data: AudioSessionToggleData.fromMap(body));
         case CallKeepEventType.devicePushTokenUpdated:
           return CallKeepVoipTokenEvent(data: VoipTokenData.fromMap(body));
       }

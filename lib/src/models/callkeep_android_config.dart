@@ -55,7 +55,8 @@ class CallKeepAndroidConfig {
       'ringtoneFileName': ringtoneFileName,
       'accentColor': accentColor,
       'backgroundUrl': backgroundUrl,
-      'incomingCallNotificationChannelName': incomingCallNotificationChannelName,
+      'incomingCallNotificationChannelName':
+          incomingCallNotificationChannelName,
       'missedCallNotificationChannelName': missedCallNotificationChannelName,
     };
   }

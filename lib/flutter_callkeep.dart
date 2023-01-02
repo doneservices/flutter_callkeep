@@ -13,8 +13,8 @@ export 'package:flutter_callkeep/src/models/models.dart';
 /// * endAllCalls()
 ///
 class CallKeep {
-  final MethodChannel _channel = const MethodChannel('flutter_callkeep');
-  final EventChannel _eventChannel = const EventChannel('flutter_callkeep_events');
+  final _channel = const MethodChannel('flutter_callkeep');
+  final _eventChannel = const EventChannel('flutter_callkeep_events');
   late final StreamSubscription _eventChannelSubscription;
 
   /// Listen to a [CallKeepEvent]
@@ -112,7 +112,8 @@ class CallKeep {
   /// On iOS: return deviceToken for VoIP.
   /// On Android: returns empty String
   Future<String> getDevicePushTokenVoIP() async {
-    return (await _channel.invokeMethod<String>("getDevicePushTokenVoIP")) ?? '';
+    return (await _channel.invokeMethod<String>("getDevicePushTokenVoIP")) ??
+        '';
   }
 
   CallKeepEvent _handleCallKeepEvent(dynamic data) {

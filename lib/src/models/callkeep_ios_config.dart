@@ -71,7 +71,8 @@ class CallKeepIosConfig {
       'audioSessionMode': audioSessionMode?.name ?? 'default',
       'audioSessionActive': audioSessionActive,
       'audioSessionPreferredSampleRate': audioSessionPreferredSampleRate,
-      'audioSessionPreferredIOBufferDuration': audioSessionPreferredIOBufferDuration,
+      'audioSessionPreferredIOBufferDuration':
+          audioSessionPreferredIOBufferDuration,
       'supportsDTMF': supportsDTMF,
       'supportsHolding': supportsHolding,
       'supportsGrouping': supportsGrouping,
@@ -81,8 +82,12 @@ class CallKeepIosConfig {
   }
 }
 
+/// The CallKit handle type
 enum CallKitHandleType { generic, number, email }
 
+/// Parses a [CallKitHandleType] from a given string [name]
+///
+/// Returns [CallKitHandleType.generic] if no value found
 CallKitHandleType callKitHandleTypeFromName(String name) {
   try {
     return CallKitHandleType.values.byName(name);
@@ -91,6 +96,8 @@ CallKitHandleType callKitHandleTypeFromName(String name) {
   }
 }
 
+/// AvAudioSession modes and descriptions can be found at
+/// https://developer.apple.com/documentation/avfaudio/avaudiosession/mode
 enum AvAudioSessionMode {
   gameChat,
   measurement,
