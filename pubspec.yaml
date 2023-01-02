@@ -3,6 +3,10 @@ description: iOS CallKit and Android ConnectionService bindings for Flutter
 version: 0.3.0
 homepage: https://github.com/doneservices/flutter_callkeep
 
+# To avoid publishing errors
+false_secrets:
+  - /example/**
+
 environment:
   sdk: '>=2.18.0 <3.0.0'
   flutter: '>=3.0.0'
