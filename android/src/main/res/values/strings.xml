@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="accept_text">Accept</string>
+    <string name="decline_text">Decline</string>
+    <string name="text_missed_call">Missed call</string>
+    <string name="text_call_back">Call back</string>
+    <string name="call_header">Call from CallKeep</string>
+</resources>

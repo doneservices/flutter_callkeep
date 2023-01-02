@@ -1,54 +1,246 @@
 package co.doneservices.callkeep
 
+import android.annotation.SuppressLint
+import android.app.Activity
+import android.content.Context
+import android.os.Handler
+import android.os.Looper
+import androidx.annotation.NonNull
+import androidx.annotation.Nullable
+
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.embedding.engine.plugins.activity.ActivityAware
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
+import io.flutter.plugin.common.EventChannel
+import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
-import io.flutter.plugin.common.PluginRegistry
+import io.flutter.plugin.common.MethodChannel.MethodCallHandler
+import io.flutter.plugin.common.MethodChannel.Result
 
-class CallKeepPlugin : FlutterPlugin, ActivityAware {
+/** CallKeepPlugin */
+class CallKeepPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
+
     companion object {
-        @JvmStatic
-        fun registerWith(registrar: PluginRegistry.Registrar) {
-            val channel = MethodChannel(registrar.messenger(), "co.doneservices/callkeep")
-            val plugin = CallKeep(channel, registrar.context().applicationContext)
 
-            plugin.currentActivity = registrar.activity()
+        @SuppressLint("StaticFieldLeak")
+        private var instance: CallKeepPlugin? = null
 
-            registrar.addRequestPermissionsResultListener(plugin)
+        public fun getInstance(): CallKeepPlugin  {
+            if(instance == null){
+                instance = CallKeepPlugin()
+            }
+            return instance!!
+        }
+
+        private val eventHandler = EventCallbackHandler()
+
+        fun sendEvent(event: String, body: Map<String, Any>) {
+            eventHandler.send(event, body)
+        }
+
+        private fun sharePluginWithRegister(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding, @Nullable handler: MethodCallHandler) {
+            if(instance == null) {
+                instance = CallKeepPlugin()
+            }
+            instance!!.context = flutterPluginBinding.applicationContext
+            instance!!.callKeepNotificationManager = CallKeepNotificationManager(flutterPluginBinding.applicationContext)
+            instance!!.channel = MethodChannel(flutterPluginBinding.binaryMessenger, "flutter_callkeep")
+            instance!!.channel?.setMethodCallHandler(handler)
+            instance!!.events =
+                EventChannel(flutterPluginBinding.binaryMessenger, "flutter_callkeep_events")
+            instance!!.events?.setStreamHandler(eventHandler)
+        }
+
+    }
+
+    /// The MethodChannel that will the communication between Flutter and native Android
+    ///
+    /// This local reference serves to register the plugin with the Flutter Engine and unregister it
+    /// when the Flutter Engine is detached from the Activity
+    private var activity: Activity? = null
+    private var context: Context? = null
+    private var callKeepNotificationManager: CallKeepNotificationManager? = null
+    private var channel: MethodChannel? = null
+    private var events: EventChannel? = null
+
+
+    override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
+        this.context = flutterPluginBinding.applicationContext
+        callKeepNotificationManager = CallKeepNotificationManager(flutterPluginBinding.applicationContext)
+        channel = MethodChannel(flutterPluginBinding.binaryMessenger, "flutter_callkeep")
+        channel?.setMethodCallHandler(this)
+        events =
+            EventChannel(flutterPluginBinding.binaryMessenger, "flutter_callkeep_events")
+        events?.setStreamHandler(eventHandler)
+ //       sharePluginWithRegister(flutterPluginBinding, this)
+    }
+
+    public fun showIncomingNotification(data: Data) {
+        data.from = "notification"
+        callKeepNotificationManager?.showIncomingNotification(data.toBundle())
+        //send BroadcastReceiver
+        context?.sendBroadcast(
+            CallKeepBroadcastReceiver.getIntentIncoming(
+                requireNotNull(context),
+                data.toBundle()
+            )
+        )
+    }
+
+    public fun showMissCallNotification(data: Data) {
+        callKeepNotificationManager?.showIncomingNotification(data.toBundle())
+    }
+
+    public fun startCall(data: Data) {
+        context?.sendBroadcast(
+            CallKeepBroadcastReceiver.getIntentStart(
+                requireNotNull(context),
+                data.toBundle()
+            )
+        )
+    }
+
+    public fun endCall(data: Data) {
+        context?.sendBroadcast(
+            CallKeepBroadcastReceiver.getIntentEnded(
+                requireNotNull(context),
+                data.toBundle()
+            )
+        )
+    }
+
+    public fun endAllCalls() {
+        val calls = getDataActiveCalls(context)
+        calls.forEach {
+            context?.sendBroadcast(
+                CallKeepBroadcastReceiver.getIntentEnded(
+                    requireNotNull(context),
+                    it.toBundle()
+                )
+            )
+        }
+        removeAllCalls(context)
+    }
+
+
+    override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {
+        try {
+            when (call.method) {
+                "displayIncomingCall" -> {
+                    val data = Data(call.arguments()?: HashMap<String, Any?>())
+                    data.from = "notification"
+                    //send BroadcastReceiver
+                    context?.sendBroadcast(
+                        CallKeepBroadcastReceiver.getIntentIncoming(
+                            requireNotNull(context),
+                            data.toBundle()
+                        )
+                    )
+                    result.success("OK")
+                }
+                "showMissCallNotification" -> {
+                    val data = Data(call.arguments()?: HashMap<String, Any?>())
+                    data.from = "notification"
+                    callKeepNotificationManager?.showMissCallNotification(data.toBundle())
+                    result.success("OK")
+                }
+                "startCall" -> {
+                    val data = Data(call.arguments()?: HashMap<String, Any?>())
+                    context?.sendBroadcast(
+                        CallKeepBroadcastReceiver.getIntentStart(
+                            requireNotNull(context),
+                            data.toBundle()
+                        )
+                    )
+                    result.success("OK")
+                }
+                "endCall" -> {
+                    val data = Data(call.arguments()?: HashMap<String, Any?>())
+                    context?.sendBroadcast(
+                        CallKeepBroadcastReceiver.getIntentEnded(
+                            requireNotNull(context),
+                            data.toBundle()
+                        )
+                    )
+                    result.success("OK")
+                }
+                "endAllCalls" -> {
+                    val calls = getDataActiveCalls(context)
+                    calls.forEach {
+                        if(it.isAccepted) {
+                            context?.sendBroadcast(
+                                CallKeepBroadcastReceiver.getIntentEnded(
+                                    requireNotNull(context),
+                                    it.toBundle()
+                                )
+                            )
+                        }else {
+                            context?.sendBroadcast(
+                                CallKeepBroadcastReceiver.getIntentDecline(
+                                    requireNotNull(context),
+                                    it.toBundle()
+                                )
+                            )
+                        }
+                    }
+                    removeAllCalls(context)
+                    result.success("OK")
+                }
+                "activeCalls" -> {
+                    result.success(getDataActiveCallsForFlutter(context))
+                }
+                "getDevicePushTokenVoIP" -> {
+                    result.success("")
+                }
+            }
+        } catch (error: Exception) {
+            result.error("error", error.message, "")
         }
     }
 
-    private var methodCallHandler: CallKeep? = null
-
-    override fun onAttachedToEngine(binding: FlutterPlugin.FlutterPluginBinding) {
-        val channel = MethodChannel(binding.flutterEngine.dartExecutor, "co.doneservices/callkeep")
-        val plugin = CallKeep(channel, binding.applicationContext)
-
-        methodCallHandler = plugin
+    override fun onDetachedFromEngine(@NonNull binding: FlutterPlugin.FlutterPluginBinding) {
+        channel?.setMethodCallHandler(null)
     }
 
-    override fun onDetachedFromEngine(binding: FlutterPlugin.FlutterPluginBinding) {
-        methodCallHandler?.stopListening()
-        methodCallHandler = null
-    }
 
     override fun onAttachedToActivity(binding: ActivityPluginBinding) {
-        val plugin = methodCallHandler ?: return
-
-        plugin.currentActivity = binding.activity
-        binding.addRequestPermissionsResultListener(plugin)
-    }
-
-    override fun onDetachedFromActivity() {
-        methodCallHandler?.currentActivity = null
-    }
-
-    override fun onReattachedToActivityForConfigChanges(binding: ActivityPluginBinding) {
-        onAttachedToActivity(binding)
+        this.activity = binding.activity
+        this.context = binding.activity.applicationContext
     }
 
     override fun onDetachedFromActivityForConfigChanges() {
-        onDetachedFromActivity()
     }
+
+    override fun onReattachedToActivityForConfigChanges(binding: ActivityPluginBinding) {
+        this.activity = binding.activity
+        this.context = binding.activity.applicationContext
+    }
+
+    override fun onDetachedFromActivity() {}
+
+
+    class EventCallbackHandler : EventChannel.StreamHandler {
+
+        private var eventSink: EventChannel.EventSink? = null
+
+        override fun onListen(arguments: Any?, sink: EventChannel.EventSink) {
+            eventSink = sink
+        }
+
+        fun send(event: String, body: Map<String, Any>) {
+            val data = mapOf(
+                "event" to event,
+                "body" to body
+            )
+            Handler(Looper.getMainLooper()).post {
+                eventSink?.success(data)
+            }
+        }
+
+        override fun onCancel(arguments: Any?) {
+            eventSink = null
+        }
+    }
+
+
 }

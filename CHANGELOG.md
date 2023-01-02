@@ -1,3 +1,7 @@
+## 0.3.0
+
+- Rework API based on `flutter_callkit_incoming`'s API, add iOS implementation and fix bugs (BREAKING CHANGE)
+
 ## 0.2.3
 
 - (android) Fix PendingIntent missing mutability flag error on API 31+
