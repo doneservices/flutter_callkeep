@@ -7,7 +7,7 @@
     <LinearLayout
         android:id="@+id/llBackground"
         android:paddingBottom="50dp"
-        android:background="@color/done_purple"
+        android:background="@color/incoming_call_bg_color"
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
@@ -27,7 +27,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
             android:gravity="center"
-            android:text="@string/callHeader"
+            android:text="@string/call_header"
             android:textAppearance="@android:style/TextAppearance.Material.Medium"
             android:textColor="@android:color/white" />
     </LinearLayout>
@@ -53,7 +53,7 @@
         android:layout_alignParentBottom="true"
         android:layout_marginEnd="25dp"
         android:layout_marginBottom="60dp"
-        android:text="@string/answer"
+        android:text="@string/accept_text"
         android:textColor="#fff"
         />
 
@@ -67,7 +67,7 @@
         android:layout_alignParentStart="true"
         android:layout_alignParentBottom="true"
         android:layout_marginEnd="45dp"
-        android:text="@string/decline"
+        android:text="@string/decline_text"
         android:textColor="#fff"
         android:layout_marginStart="25dp"
         android:layout_marginBottom="60dp"

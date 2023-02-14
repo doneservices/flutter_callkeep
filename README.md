@@ -176,3 +176,29 @@ CallKeep.instance.onEvent.listen((event) async {
     }
 });
 ```
+
+### Customization (Android):
+
+You can customize background color and add localizations to text through adding the values to your '{{yourApp}}/android/app/src/main/res/values' and '{{yourApp}}/android/app/src/main/res/values-{{languageCode}}' for localizations.
+
+The main values are:
+in `colors.xml`
+```xml
+    <!-- A hex color value to be displayed on the top part of the custom incoming call UI --> 
+    <color name="incoming_call_bg_color">#80ffffff</color>
+```
+
+in `strings.xml`
+```xml
+    <!-- Accept button call text, useful for localization --> 
+    <string name="accept_text">Accept</string>
+    <!-- Decline button call text, useful for localization --> 
+    <string name="decline_text">Decline</string>
+    <!-- Missed call text, useful for localization --> 
+    <string name="text_missed_call">Missed call</string>
+    <!-- Callback button text, useful for localization --> 
+    <string name="text_call_back">Call back</string>
+    <!-- Incoming call custom UI header, useful for localization -->
+    <!-- This can be set from Flutter as well when displaying incoming call --> 
+    <string name="call_header">Call from CallKeep</string>
+```
