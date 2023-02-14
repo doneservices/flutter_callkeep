@@ -96,13 +96,9 @@ public class SwiftCallKeepPlugin: NSObject, FlutterPlugin, CXProviderDelegate {
                 result(FlutterError.nilArgument)
                 return
             }
-            if(self.isFromPushKit){
+            if let getArgs = args as? [String: Any] {
+                self.data = Data(args: getArgs)
                 self.endCall(self.data!)
-            }else{
-                if let getArgs = args as? [String: Any] {
-                    self.data = Data(args: getArgs)
-                    self.endCall(self.data!)
-                }
             }
             result("OK")
             break
@@ -175,13 +171,12 @@ public class SwiftCallKeepPlugin: NSObject, FlutterPlugin, CXProviderDelegate {
     }
     
     @objc public func endCall(_ data: Data) {
-        var call: Call? = nil
+        var call: Call? = self.callManager?.callWithUUID(uuid: UUID(uuidString: data.uuid)!)
+        if(call == nil) {return}
+
         if(self.isFromPushKit){
-            call = Call(uuid: UUID(uuidString: self.data!.uuid)!, data: data)
             self.isFromPushKit = false
             self.sendEvent(SwiftCallKeepPlugin.ACTION_CALL_ENDED, data.toJSON())
-        }else {
-            call = Call(uuid: UUID(uuidString: data.uuid)!, data: data)
         }
         self.callManager?.endCall(call: call!)
     }
@@ -372,7 +367,7 @@ public class SwiftCallKeepPlugin: NSObject, FlutterPlugin, CXProviderDelegate {
         }
         self.outgoingCall = call;
         self.callManager?.addCall(call)
-        self.sendEvent(SwiftCallKeepPlugin.ACTION_CALL_START, self.data?.toJSON())
+        self.sendEvent(SwiftCallKeepPlugin.ACTION_CALL_START, call.data.toJSON())
         action.fulfill()
     }
     
@@ -387,7 +382,7 @@ public class SwiftCallKeepPlugin: NSObject, FlutterPlugin, CXProviderDelegate {
         call.data.isAccepted = true
         self.answerCall = call
         self.callManager?.updateCall(call)
-        sendEvent(SwiftCallKeepPlugin.ACTION_CALL_ACCEPT, self.data?.toJSON())
+        sendEvent(SwiftCallKeepPlugin.ACTION_CALL_ACCEPT, call.data.toJSON())
         action.fulfill()
     }
     
@@ -400,12 +395,12 @@ public class SwiftCallKeepPlugin: NSObject, FlutterPlugin, CXProviderDelegate {
         call.endCall()
         self.callManager?.removeCall(call)
         if (self.answerCall == nil && self.outgoingCall == nil) {
-            sendEvent(SwiftCallKeepPlugin.ACTION_CALL_DECLINE, self.data?.toJSON())
+            sendEvent(SwiftCallKeepPlugin.ACTION_CALL_DECLINE, call.data.toJSON())
             DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
                 action.fulfill()
             }
         }else {
-            sendEvent(SwiftCallKeepPlugin.ACTION_CALL_ENDED, self.data?.toJSON())
+            sendEvent(SwiftCallKeepPlugin.ACTION_CALL_ENDED, call.data.toJSON())
             action.fulfill()
         }
     }
@@ -481,15 +476,7 @@ public class SwiftCallKeepPlugin: NSObject, FlutterPlugin, CXProviderDelegate {
             print("Call is on hold")
             return
         }
-        self.outgoingCall?.endCall()
-        if(self.outgoingCall != nil){
-            self.outgoingCall = nil
-        }
-        self.answerCall?.endCall()
-        if(self.answerCall != nil){
-            self.answerCall = nil
-        }
-        self.callManager?.removeAllCalls()
+
         self.sendEvent(SwiftCallKeepPlugin.ACTION_CALL_TOGGLE_AUDIO_SESSION, [ "isActivate": false ])
     }
     
