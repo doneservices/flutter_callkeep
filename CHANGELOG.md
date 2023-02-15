@@ -1,6 +1,9 @@
 ## 0.3.1+1
 
 - Add default Android values and fix example app
+- Update example app dependencies
+- Bump example app iOS deployment target to iOS 11
+- Bump example app Android minimum SDK version to 33
 
 ## 0.3.1
 
