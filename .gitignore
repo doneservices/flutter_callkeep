@@ -7,3 +7,9 @@
 build/
 example/.flutter-plugins-dependencies
 .last_build_id
+
+# IntelliJ related
+*.iml
+*.ipr
+*.iws
+.idea/
