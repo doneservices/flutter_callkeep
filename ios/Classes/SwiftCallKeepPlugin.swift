@@ -171,14 +171,16 @@ public class SwiftCallKeepPlugin: NSObject, FlutterPlugin, CXProviderDelegate {
     }
     
     @objc public func endCall(_ data: Data) {
-        var call: Call? = self.callManager?.callWithUUID(uuid: UUID(uuidString: data.uuid)!)
-        if(call == nil) {return}
-
-        if(self.isFromPushKit){
-            self.isFromPushKit = false
-            self.sendEvent(SwiftCallKeepPlugin.ACTION_CALL_ENDED, data.toJSON())
+        if let uuid = UUID(uuidString: data.uuid) {
+            var call: Call? = self.callManager?.callWithUUID(uuid: uuid)
+            if(call == nil) {return}
+            
+            if(self.isFromPushKit){
+                self.isFromPushKit = false
+                self.sendEvent(SwiftCallKeepPlugin.ACTION_CALL_ENDED, data.toJSON())
+            }
+            self.callManager?.endCall(call: call!)
         }
-        self.callManager?.endCall(call: call!)
     }
     
     @objc public func activeCalls() -> [[String: Any]]? {
@@ -386,7 +388,6 @@ public class SwiftCallKeepPlugin: NSObject, FlutterPlugin, CXProviderDelegate {
         action.fulfill()
     }
     
-
     public func provider(_ provider: CXProvider, perform action: CXEndCallAction) {
         guard let call = self.callManager?.callWithUUID(uuid: action.callUUID) else {
             action.fail()
@@ -476,7 +477,7 @@ public class SwiftCallKeepPlugin: NSObject, FlutterPlugin, CXProviderDelegate {
             print("Call is on hold")
             return
         }
-
+        
         self.sendEvent(SwiftCallKeepPlugin.ACTION_CALL_TOGGLE_AUDIO_SESSION, [ "isActivate": false ])
     }
     
@@ -506,8 +507,8 @@ class EventCallbackHandler: FlutterStreamHandler {
 }
 
 extension FlutterError {
-  static let nilArgument = FlutterError(
-    code: "argument.nil",
-    message: "Expected arguments when invoking channel method, but it is nil.", details: nil
-  )
+    static let nilArgument = FlutterError(
+        code: "argument.nil",
+        message: "Expected arguments when invoking channel method, but it is nil.", details: nil
+    )
 }

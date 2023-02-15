@@ -1,3 +1,7 @@
+## 0.3.1+1
+
+- Add default Android values and fix example app
+
 ## 0.3.1
 
 - Improve calls management on iOS implementation
