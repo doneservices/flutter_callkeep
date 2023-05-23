@@ -21,7 +21,7 @@ class CallManager: NSObject {
     }
     
     func startCall(_ data: Data) {
-        let handle = CXHandle(type: self.getHandleType(data.handleType), value: data.getEncryptHandle())
+        let handle = CXHandle(type: self.getHandleType(data.handleType), value: data.handle)
         let uuid = UUID(uuidString: data.uuid)
         let startCallAction = CXStartCallAction(call: uuid!, handle: handle)
         startCallAction.isVideo = data.hasVideo

@@ -25,15 +25,15 @@ import flutter_callkeep
                               continue userActivity: NSUserActivity,
                               restorationHandler: @escaping ([UIUserActivityRestoring]?) -> Void) -> Bool {
         
-        guard let handleObj = userActivity.handle else {
+        guard let handle = userActivity.handle else {
             return false
         }
         
         guard let isVideo = userActivity.isVideo else {
             return false
         }
-        let callerName = handleObj.getDecryptHandle()["callerName"] as? String ?? ""
-        let handle = handleObj.getDecryptHandle()["handle"] as? String ?? ""
+        let callerName = handle as? String ?? ""
+        let handle = handle as? String ?? ""
         let data = flutter_callkeep.Data(id: UUID().uuidString, callerName: callerName, handle: handle, hasVideo: isVideo)
         //set more data...
         data.callerName = "Johnny"
