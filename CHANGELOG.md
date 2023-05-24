@@ -1,3 +1,6 @@
+## 0.3.2
+
+- Stop decrypting handle on iOS
 ## 0.3.1+1
 
 - Add default Android values and fix example app

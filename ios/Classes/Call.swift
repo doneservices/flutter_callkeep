@@ -258,9 +258,4 @@ public class Call: NSObject {
         return map
     }
     
-    func getEncryptHandle() -> String {
-        return String(format: "{\"callerName\":\"%@\", \"handle\":\"%@\"}", callerName, handle).encryptHandle()
-    }
-    
-    
 }
