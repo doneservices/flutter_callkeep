@@ -404,6 +404,8 @@ public class SwiftCallKeepPlugin: NSObject, FlutterPlugin, CXProviderDelegate {
             sendEvent(SwiftCallKeepPlugin.ACTION_CALL_ENDED, call.data.toJSON())
             action.fulfill()
         }
+        if(call === self.outgoingCall) {self.outgoingCall = nil}
+        if(call === self.answerCall) {self.answerCall = nil}
     }
     
     
