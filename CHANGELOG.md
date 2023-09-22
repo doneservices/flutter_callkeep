@@ -1,5 +1,10 @@
 ## 0.3.2
 
+- (iOS) Clear outgoing and answercall properly.
+- (iOS) Use `connectedAt` to set when outgoing call connects.
+- (Dart) Update constraints to use version 3 and above
+## 0.3.2
+
 - Stop decrypting handle on iOS
 ## 0.3.1+1
 
