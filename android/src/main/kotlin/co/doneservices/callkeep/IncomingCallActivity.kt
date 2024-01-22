@@ -62,9 +62,9 @@ class IncomingCallActivity : Activity() {
                     Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_REORDER_TO_FRONT
         }
 
-        fun getIntentEnded(context: Context) =
-                Intent("${context.packageName}.${ACTION_ENDED_CALL_INCOMING}")
-
+        fun getIntentEnded(context: Context): Intent {
+            return Intent("${context.packageName}.$ACTION_ENDED_CALL_INCOMING")
+        }
     }
 
     inner class EndedCallKeepBroadcastReceiver : BroadcastReceiver() {
@@ -109,7 +109,7 @@ class IncomingCallActivity : Activity() {
         updateViewWithIncomingIntentData(intent)
         registerReceiver(
                 endedCallKeepBroadcastReceiver,
-                IntentFilter(ACTION_ENDED_CALL_INCOMING)
+                IntentFilter("${packageName}.${ACTION_ENDED_CALL_INCOMING}")
         )
     }
 
