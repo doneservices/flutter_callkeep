@@ -29,6 +29,8 @@ apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
 android {
     compileSdkVersion 33
 
+    namespace 'com.example.flutter_callkeep_example'
+
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
     }
