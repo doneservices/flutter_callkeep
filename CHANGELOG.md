@@ -1,5 +1,6 @@
 ## 0.3.4
 - (Android) Support Gradle plugin 8+
+- (Android) Fix FullScreenIntent not being removed when `endAllCalls` is called (#63)
 
 ## 0.3.3
 
