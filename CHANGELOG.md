@@ -1,3 +1,6 @@
+## 0.3.4
+- (Android) Support Gradle plugin 8+
+
 ## 0.3.3
 
 - (iOS) Clear outgoing and answercall properly.
