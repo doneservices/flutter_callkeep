@@ -27,6 +27,8 @@ apply plugin: 'kotlin-android'
 android {
     compileSdkVersion 32
 
+    namespace 'co.doneservices.callkeep'
+
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
     }
