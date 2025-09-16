@@ -112,7 +112,7 @@ class IncomingCallActivity : Activity() {
             registerReceiver(
                     endedCallKeepBroadcastReceiver,
                     IntentFilter("${packageName}.${ACTION_ENDED_CALL_INCOMING}"),
-                    ContextCompat.RECEIVER_NOT_EXPORTED
+                    RECEIVER_NOT_EXPORTED
             )
         } else {
             registerReceiver(
@@ -301,8 +301,5 @@ class IncomingCallActivity : Activity() {
         unregisterReceiver(endedCallKeepBroadcastReceiver)
         super.onDestroy()
     }
-
-    override fun onBackPressed() {}
-
 
 }
