@@ -23,6 +23,7 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Button
+import androidx.core.content.ContextCompat
 import co.doneservices.callkeep.CallKeepBroadcastReceiver.Companion.ACTION_CALL_INCOMING
 import co.doneservices.callkeep.CallKeepBroadcastReceiver.Companion.EXTRA_CALLKEEP_AVATAR
 import co.doneservices.callkeep.CallKeepBroadcastReceiver.Companion.EXTRA_CALLKEEP_BACKGROUND_URL
@@ -107,10 +108,18 @@ class IncomingCallActivity : Activity() {
         setContentView(R.layout.activity_call_incoming)
         initView()
         updateViewWithIncomingIntentData(intent)
-        registerReceiver(
-                endedCallKeepBroadcastReceiver,
-                IntentFilter("${packageName}.${ACTION_ENDED_CALL_INCOMING}")
-        )
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            registerReceiver(
+                    endedCallKeepBroadcastReceiver,
+                    IntentFilter("${packageName}.${ACTION_ENDED_CALL_INCOMING}"),
+                    ContextCompat.RECEIVER_NOT_EXPORTED
+            )
+        } else {
+            registerReceiver(
+                    endedCallKeepBroadcastReceiver,
+                    IntentFilter("${packageName}.${ACTION_ENDED_CALL_INCOMING}")
+            )
+        }
     }
 
     private fun wakeLockRequest(duration: Long) {
